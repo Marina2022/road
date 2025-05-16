@@ -3,9 +3,9 @@ import {tickets} from "@/data";
 
 
 interface TicketPageProps {
-  params: {
+  params: Promise<{
     ticketId: string
-  }
+  }>
 }
 
 const Page = async ({params}: TicketPageProps) => {
