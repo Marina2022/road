@@ -19,8 +19,7 @@ const Page = async ({params}: TicketPageProps) => {
   return (
     <div className="w-4/5 m-auto mt-3" >
       <h1 className="text-2xl">Ticket {ticketId}</h1>
-      <p>{ticket.content}</p>
-      
+      <p>{ticket.content}</p>      
     </div>
   );
 };
