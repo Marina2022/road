@@ -1,13 +1,19 @@
 'use client'
 
+import {Button} from "@/components/ui/button"
+
 
 export default function Home() {
- 
 
-  return (   
-      <div>
+
+  return (
+    <div>
+      <p>
         Just Home page
-      </div>
+      </p>
+
+      <Button variant="secondary" className="mt-5">Button</Button>
+    </div>
   )
 }
 
