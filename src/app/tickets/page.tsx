@@ -4,7 +4,6 @@ import CheckIcon from "@/components/icons/CheckIcon";
 import DocumentIcon from "@/components/icons/DocumentIcon";
 import PencilIcon from "@/components/icons/PencilIcon";
 import {tickets} from "@/data";
-import {Button} from "@/components/ui/button";
 
 export default function Tickets() {
 
