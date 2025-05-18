@@ -1,6 +1,7 @@
 'use client'
 
-import {Button} from "@/components/ui/button"
+import Heading from "@/components/shared/Heading";
+import {Button} from "@/components/ui/button";
 
 
 export default function Home() {
@@ -8,11 +9,10 @@ export default function Home() {
 
   return (
     <div>
-      <p>
-        Just Home page
-      </p>
-
-      <Button variant="secondary" className="mt-5">Button</Button>
+      <Heading title="Home page" text="Just Home page"/>
+      <Button>
+        Staaart
+      </Button>
     </div>
   )
 }

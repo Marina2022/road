@@ -1,31 +1,15 @@
-import clsx from "clsx";
-import Link from "next/link";
-import CheckIcon from "@/components/icons/CheckIcon";
-import DocumentIcon from "@/components/icons/DocumentIcon";
-import PencilIcon from "@/components/icons/PencilIcon";
+import Heading from "@/components/shared/Heading";
 import {tickets} from "@/data";
+import TicketItem from "@/features/ticket/components/TicketItem";
 
 export default function Tickets() {
-
-  const TICKET_ICONS = {
-    DONE: <CheckIcon/>,
-    OPEN: <DocumentIcon/>,
-    IN_PROGRESS: <PencilIcon/>,
-  }
-
-
   return (
-    <div className="w-4/5 m-auto mt-3">
-      <ul className="grid grid-cols-4 gap-4 animate-fade-in ">
+    <div className="w-full  m-auto mt-3">
+      <Heading title="Tickets" text="All your tickets in one place"/>
+      <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 animate-fade-in ">
         {
-          tickets.map(ticket => <li className="p-4 shadow-lg border mb-2 border-slate-100 rounded" key={ticket.id}>
-            <p>{TICKET_ICONS[ticket.status]}</p>
-            <p className={clsx("text-muted-foreground mt-2", {"line-through": ticket.status === 'DONE'})}>
-              {ticket.title}
-            </p>
-            {/*<Button variant="ghost">Ghost</Button>*/}
-            <Link className="text-sm underline" href={`/tickets/${ticket.id}`}>View</Link>
-          </li>)
+          tickets.map(ticket => <TicketItem key={ticket.id} ticket={ticket} />
+          )
         }
       </ul>
     </div>
