@@ -21,7 +21,11 @@ const ToggleTheme = () => {
     <div>
       <button onClick={handleTheme} className="cursor-pointer">        
         {
-          theme === 'dark' ? <Sun /> : <Moon /> 
+          // theme === 'dark' ? <Sun /> : <Moon /> 
+
+
+          <Sun />
+
         }               
       </button>
     </div>
