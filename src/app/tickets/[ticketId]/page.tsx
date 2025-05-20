@@ -1,6 +1,6 @@
 import React from 'react';
-import {tickets} from "@/data";
 import TicketItem from "@/features/ticket/components/TicketItem";
+import {getTicket} from "@/features/ticket/server-actions";
 
 
 interface TicketPageProps {
@@ -11,7 +11,7 @@ interface TicketPageProps {
 
 const Page = async ({params}: TicketPageProps) => {
   const { ticketId } = await params;
-  const ticket = tickets.find(ticket => ticket.id === ticketId)
+  const ticket = await getTicket( Number(ticketId))
   
   if (!ticket) {
     return <div>Ticket not found</div>

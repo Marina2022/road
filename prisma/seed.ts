@@ -1,5 +1,6 @@
-import { PrismaClient } from "@/generated/prisma/client"
+
 import { TicketStatus } from "@/features/ticket/types"
+import { PrismaClient } from "@prisma/client"
 
 const prisma = new PrismaClient()
 

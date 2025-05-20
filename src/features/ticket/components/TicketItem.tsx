@@ -4,7 +4,8 @@ import Link from "next/link";
 import React from 'react';
 import {Button} from "@/components/ui/button";
 import {TICKET_ICONS} from "@/features/ticket/constants";
-import {Ticket} from "@/features/ticket/types";
+import { Ticket } from "@prisma/client";
+
 
 const TicketItem = ({ticket}: { ticket: Ticket }) => {
   return (

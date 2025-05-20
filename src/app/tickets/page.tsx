@@ -1,8 +1,13 @@
 import Heading from "@/components/shared/Heading";
-import {tickets} from "@/data";
 import TicketItem from "@/features/ticket/components/TicketItem";
+import {getTickets} from "@/features/ticket/server-actions";
 
-export default function Tickets() {
+export default async function Tickets() {
+  
+  const tickets = await getTickets();
+  
+  if (!tickets) return null
+  
   return (
     <div className="w-full  m-auto mt-3">
       <Heading title="Tickets" text="All your tickets in one place"/>
