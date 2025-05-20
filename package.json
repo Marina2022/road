@@ -11,6 +11,7 @@
     "type": "tsc --noEmit"
   },
   "dependencies": {
+    "@prisma/client": "^6.8.2",
     "@radix-ui/react-separator": "^1.1.6",
     "@radix-ui/react-slot": "^1.2.2",
     "@tailwindcss/postcss": "^4.1.7",
