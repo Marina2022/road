@@ -3,6 +3,8 @@ import type {Metadata} from "next";
 import {Geist, Geist_Mono} from "next/font/google";
 import Header from "@/components/layout/Header";
 import Providers from "@/providers";
+import React from "react";
+import RedirectToaster from "@/components/shared/RedirectToaster";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -40,6 +42,7 @@ export default function RootLayout({
         {children}
       </main>
     </Providers>
+    <RedirectToaster />
     </body>
     </html>
   )

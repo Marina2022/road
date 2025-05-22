@@ -9,9 +9,7 @@ type ErrorMessageProps = {
 const ErrorMessage = ({formState, name}: ErrorMessageProps) => {
   
   const message = formState?.fieldErrors?.[name]?.[0]
-
-  console.log('message = ', message)
-
+  
   return (
       <p className="text-red-500">{message} </p>    
   );

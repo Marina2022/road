@@ -13,7 +13,7 @@ const Providers = ({children}: {children: React.ReactNode}) => {
     >
       {children}
 
-      <Toaster/>
+      <Toaster expand/>      
     </ThemeProvider>
   );
 };

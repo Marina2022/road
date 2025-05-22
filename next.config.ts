@@ -4,6 +4,7 @@ module.exports = {
   //     dynamic: 30
   //   }
   // },
+  reactStrictMode: false,
   devIndicators: false,
   eslint: {
     ignoreDuringBuilds: true,

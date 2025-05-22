@@ -7,6 +7,7 @@ import {cache} from "react";
 import {redirect} from "next/navigation";
 import {z} from "zod";
 import {ActionState, fromErrorToState} from "@/utils/formUtils";
+import {setCookie} from "@/actions/cookies";
 
 export const getTickets = async (): Promise<Ticket[] | null> => {
   try {
@@ -105,18 +106,20 @@ export const updateTicket = async (id: number, state: ActionState, formData: For
       }
     )
     revalidatePath('/tickets')
-    return {
-      message: 'Ticket updated',
-      payload: formData,
-      fieldErrors: {},
-      timestamp: Date.now(),
-      status: 'SUCCESS'
-    }
+    // return {
+    //   message: 'Ticket updated',
+    //   payload: formData,
+    //   fieldErrors: {},
+    //   timestamp: Date.now(),
+    //   status: 'SUCCESS'
+    // }
+    
 
   } catch (err) {
     console.log(err)
     return fromErrorToState(err, formData)
   }
 
-  // redirect('/tickets')
+  await setCookie({key: 'toast', value: 'Ticket updated'})
+  redirect(`/tickets/${id}`)
 }

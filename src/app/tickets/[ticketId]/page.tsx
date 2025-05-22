@@ -1,6 +1,8 @@
 import React from 'react';
 import TicketItem from "@/features/ticket/components/TicketItem";
 import {getTicket, getTickets} from "@/features/ticket/server-actions";
+import {getCookie} from "@/actions/cookies";
+import RedirectToaster from "@/components/shared/RedirectToaster";
 
 
 interface TicketPageProps {
@@ -10,6 +12,8 @@ interface TicketPageProps {
 }
 
 const Page = async ({params}: TicketPageProps) => {
+  
+   
   const { ticketId } = await params;
   const ticket = await getTicket( Number(ticketId))
   
@@ -19,7 +23,8 @@ const Page = async ({params}: TicketPageProps) => {
   
   return (
     <div className="w-4/5 m-auto mt-3" >
-      <TicketItem ticket={ticket} editing={true}  />
+      {/*<RedirectToaster  />*/}
+      <TicketItem ticket={ticket} editing={true} />
     </div>
   )
 }
