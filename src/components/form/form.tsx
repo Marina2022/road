@@ -4,7 +4,7 @@ import useFormFeedback from "@/hooks/use-form-feedback";
 import {ActionState} from "@/utils/formUtils";
 
 type FormProps = {
-  action: (FormData)=>void,
+  action: (formData: FormData)=>void,
   children: React.ReactNode,
   actionState: ActionState  
 }
@@ -12,10 +12,10 @@ type FormProps = {
 const Form = ({action, actionState, children}:FormProps ) => {
 
   const options = useMemo(() => ({
-    onSuccess: ({actionState}) => {
+    onSuccess: ({actionState}:{ actionState: ActionState }) => {
       toast.success(actionState.message)
     },
-    onError: ({actionState}) => {
+    onError: ({actionState}: { actionState: ActionState }) => {
       if (actionState.message) toast.error(actionState.message)
     },
   }), [])
