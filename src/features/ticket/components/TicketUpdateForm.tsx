@@ -7,28 +7,24 @@ import {Input} from "@/components/ui/input";
 import {updateTicket} from "@/features/ticket/server-actions";
 import {Ticket} from "@prisma/client";
 import SubmitButton from "@/components/form/SubmitButton";
+import ErrorMessage from "@/components/form/error-message";
+import {EMPTY_STATE} from "@/utils/formUtils";
+import Form from "@/components/form/form";
 
 const TicketUpdateForm = ({ticket}: { ticket: Ticket }) => {
-  
-  const [formState, action] = useActionState(updateTicket.bind(null, ticket.id), {message: ''})
-
-    
+  const [formState, action] = useActionState(updateTicket.bind(null, ticket.id), EMPTY_STATE)  
   return (
-    <form action={action} className="flex flex-col gap-2">
+    <Form action={action} actionState={formState}>
       <Label htmlFor="title"/>
-      <Input defaultValue={ formState.payload?.get('title') as string ?? ticket.title} type="text" id="title" name="title"/>
-      {
-        formState?.fieldErrors?.title?.[0] && <p className="text-red-500">{formState?.fieldErrors?.title[0]}</p>
-      }
-
+      <Input defaultValue={formState.payload?.get('title') as string ?? ticket.title} type="text" id="title"
+             name="title"/>
+      <ErrorMessage formState={formState} name="title"/>
       <Label htmlFor="content"/>
-      <Textarea defaultValue={ formState.payload?.get('content') as string ?? ticket.content} id="content" name="content" className="mb-2"/>
+      <Textarea defaultValue={formState.payload?.get('content') as string ?? ticket.content} id="content" name="content"
+                className="mb-2"/>
+      <ErrorMessage formState={formState} name="content"/>
       <SubmitButton label="Update"/>
-
-      {
-        formState?.fieldErrors?.content?.[0] && <p className="text-red-500">{formState?.fieldErrors?.content?.[0]}</p>
-      }
-    </form>
+    </Form>
   );
 };
 

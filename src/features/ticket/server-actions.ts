@@ -51,14 +51,19 @@ export const deleteTicket = async (id: number): Promise<void> => {
   }
 }
 
-export const createTicket = async (formData: FormData): Promise<void> => {
+export const createTicket = async (state: ActionState, formData: FormData): Promise<ActionState> => {
 
   const title = formData.get('title') as string
   const content = formData.get('content') as string
 
-  if (!title || !content) throw new Error('Missing title or content')
-
+  const updateTicketSchema = z.object({
+    title: z.string().min(1).max(191),
+    content: z.string().min(1).max(1024)
+  })
+  
   try {
+    updateTicketSchema.parse({title, content})
+    
     await prisma.ticket.create(
       {
         data: {
@@ -67,9 +72,16 @@ export const createTicket = async (formData: FormData): Promise<void> => {
       }
     )
     revalidatePath('/tickets')
-
+    return {
+      message: 'Ticket created',
+      payload: formData,
+      fieldErrors: {},
+      timestamp: Date.now(),
+      status: 'SUCCESS'
+    }
   } catch (err) {
     console.log(err)
+    return fromErrorToState(err, formData)
   }
 }
 
@@ -93,11 +105,18 @@ export const updateTicket = async (id: number, state: ActionState, formData: For
       }
     )
     revalidatePath('/tickets')
+    return {
+      message: 'Ticket updated',
+      payload: formData,
+      fieldErrors: {},
+      timestamp: Date.now(),
+      status: 'SUCCESS'
+    }
 
   } catch (err) {
     console.log(err)
     return fromErrorToState(err, formData)
   }
 
-  redirect('/tickets')
+  // redirect('/tickets')
 }
