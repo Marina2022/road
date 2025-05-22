@@ -1,22 +1,24 @@
 import Heading from "@/components/shared/Heading";
-import TicketItem from "@/features/ticket/components/TicketItem";
-import {getTickets} from "@/features/ticket/server-actions";
+import TicketsList from "@/features/ticket/components/TicketsList";
+import React, {Suspense} from "react";
+import Loader from "@/components/shared/Loader";
+import CardCompact from "@/components/shared/Card-compact";
+import TicketCreateForm from "@/features/ticket/components/TicketCreateForm";
 
-export default async function Tickets() {
-  
-  const tickets = await getTickets();
-  
-  if (!tickets) return null
-  
+export default function Tickets() {
+
   return (
     <div className="w-full  m-auto mt-3">
       <Heading title="Tickets" text="All your tickets in one place"/>
-      <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 animate-fade-in ">
-        {
-          tickets.map(ticket => <TicketItem key={ticket.id} ticket={ticket} />
-          )
-        }
-      </ul>
+
+      <CardCompact className="max-w-[520px] mx-auto mb-10" 
+                   title="Create a Ticket" 
+                   description="Create a Ticket"
+                   content={<TicketCreateForm/>}/>
+
+      <Suspense fallback={<Loader/>}>
+        <TicketsList/>
+      </Suspense>
     </div>
   )
 }

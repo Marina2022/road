@@ -1,6 +1,6 @@
 import React from 'react';
 import TicketItem from "@/features/ticket/components/TicketItem";
-import {getTicket} from "@/features/ticket/server-actions";
+import {getTicket, getTickets} from "@/features/ticket/server-actions";
 
 
 interface TicketPageProps {
@@ -19,10 +19,18 @@ const Page = async ({params}: TicketPageProps) => {
   
   return (
     <div className="w-4/5 m-auto mt-3" >
-
-      <TicketItem ticket={ticket} />
+      <TicketItem ticket={ticket} editing={true}  />
     </div>
-  );
-};
+  )
+}
+
+export async function generateStaticParams() {
+  const tickets = await getTickets();
+  
+  if (!tickets) return []
+
+  return tickets.map(ticket => ({ticketId: ticket.id.toString()}))
+}
+
 
 export default Page;
