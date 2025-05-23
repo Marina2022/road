@@ -3,6 +3,7 @@
 import {Moon, Sun} from "lucide-react";
 import {useTheme} from 'next-themes'
 import React from 'react';
+import {Button} from "@/components/ui/button";
 
 
 const ToggleTheme = () => {
@@ -19,15 +20,10 @@ const ToggleTheme = () => {
 
   return (
     <div>
-      <button onClick={handleTheme} className="cursor-pointer">        
-        {
-          // theme === 'dark' ? <Sun /> : <Moon /> 
-
-
-          <Sun />
-
-        }               
-      </button>
+      <Button variant="outline" size="icon" className="cursor-pointer" onClick={handleTheme}>
+        <Moon className="h-[1.2rem] w-[1.2rem] scale-100 transition-all  dark:scale-0"/>
+        <Sun className="absolute h-[1.2rem] w-[1.2rem]  scale-0 transition-all dark:scale-100"/>
+      </Button>
     </div>
   );
 };
