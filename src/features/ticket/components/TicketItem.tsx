@@ -6,6 +6,7 @@ import {Button} from "@/components/ui/button";
 import {TICKET_ICONS} from "@/features/ticket/constants";
 import {Ticket} from "@prisma/client";
 import {deleteTicket} from "@/features/ticket/server-actions";
+import {fromCentsToDollars} from "@/utils/currency";
 
 
 const TicketItem = ({ticket, editing = false}: { ticket: Ticket, editing?: boolean }) => {
@@ -40,9 +41,12 @@ const TicketItem = ({ticket, editing = false}: { ticket: Ticket, editing?: boole
           </p>
         </div>
         <p className="line-clamp-3 py-4">{ticket.content}</p>
+        <div className="flex gap-4 justify-between">
+          <div className="text-gray-400">{ticket.deadline}</div>
+          <div className="font-bold">{fromCentsToDollars(ticket.bounty)}</div>
+        </div>
       </div>
       <div className="flex flex-col gap-2">
-
         {
           editing ?
             <>
@@ -55,7 +59,6 @@ const TicketItem = ({ticket, editing = false}: { ticket: Ticket, editing?: boole
               {editBtn}
             </>
         }
-
       </div>
     </li>
   );

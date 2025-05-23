@@ -8,6 +8,7 @@ import {redirect} from "next/navigation";
 import {z} from "zod";
 import {ActionState, fromErrorToState} from "@/utils/formUtils";
 import {setCookie} from "@/actions/cookies";
+import {fromDollarsToCents, fromDollarsToCentsNoMoneyFormat} from "@/utils/currency";
 
 export const getTickets = async (): Promise<Ticket[] | null> => {
   try {
@@ -52,24 +53,31 @@ export const deleteTicket = async (id: number): Promise<void> => {
   }
 }
 
+
+const updateTicketSchema = z.object({
+  title: z.string().min(1).max(191),
+  content: z.string().min(1).max(1024),
+  deadline: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Format is bad"),
+  bounty: z.coerce.number().positive()
+})
+
+
 export const createTicket = async (state: ActionState, formData: FormData): Promise<ActionState> => {
 
   const title = formData.get('title') as string
   const content = formData.get('content') as string
+  const deadline = formData.get('deadline') as string
+  const bounty = formData.get('bounty')
 
-  const updateTicketSchema = z.object({
-    title: z.string().min(1).max(191),
-    content: z.string().min(1).max(1024)
-  })
-  
+
   try {
-    updateTicketSchema.parse({title, content})
+    const data = updateTicketSchema.parse({title, content, deadline, bounty})
+
+    const dataForDB = {...data, bounty: fromDollarsToCentsNoMoneyFormat(data.bounty) }
     
     await prisma.ticket.create(
       {
-        data: {
-          title, content
-        }
+        data: dataForDB
       }
     )
     revalidatePath('/tickets')
@@ -90,30 +98,22 @@ export const updateTicket = async (id: number, state: ActionState, formData: For
 
   const title = formData.get('title') as string
   const content = formData.get('content') as string
+  const deadline = formData.get('deadline') as string
+  const bounty = formData.get('bounty')
 
-  const updateTicketSchema = z.object({
-    title: z.string().min(1).max(191),
-    content: z.string().min(1).max(1024)
-  })
 
   try {
-    const data = updateTicketSchema.parse({title, content})
+    const data = updateTicketSchema.parse({title, content, deadline, bounty})
+
+    const dataForDB = {...data, bounty: fromDollarsToCentsNoMoneyFormat(data.bounty) }
 
     await prisma.ticket.update(
       {
-        data,
+        data: dataForDB,
         where: {id}
       }
     )
     revalidatePath('/tickets')
-    // return {
-    //   message: 'Ticket updated',
-    //   payload: formData,
-    //   fieldErrors: {},
-    //   timestamp: Date.now(),
-    //   status: 'SUCCESS'
-    // }
-    
 
   } catch (err) {
     console.log(err)
