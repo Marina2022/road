@@ -1,6 +1,6 @@
 'use client'
 
-import React, {useActionState} from 'react';
+import React, {useActionState, useRef} from 'react';
 import {Label} from "@/components/ui/label";
 import {Textarea} from "@/components/ui/textarea";
 import {Input} from "@/components/ui/input";
@@ -11,11 +11,19 @@ import ErrorMessage from "@/components/form/error-message";
 import {EMPTY_STATE} from "@/utils/formUtils";
 import Form from "@/components/form/form";
 import {fromCentsToDollarsNoMoneyFormat} from "@/utils/currency";
+import DatePicker from "@/components/shared/Date-picker";
 
 const TicketUpdateForm = ({ticket}: { ticket: Ticket }) => {
-  const [formState, action] = useActionState(updateTicket.bind(null, ticket.id), EMPTY_STATE)  
+      
+  const [formState, action] = useActionState(updateTicket.bind(null, ticket.id), EMPTY_STATE)
+  const imperativeHandleRef = useRef<{reset: ()=>void}>(null)
+
+  const handleSuccess = ()=>{
+    imperativeHandleRef.current?.reset()
+  }
+  
   return (
-    <Form action={action} actionState={formState}>
+    <Form action={action} actionState={formState} onSuccess={handleSuccess}>
       <Label htmlFor="title">Title</Label>
       <Input defaultValue={formState.payload?.get('title') as string ?? ticket.title} type="text" id="title"
              name="title"/>
@@ -29,7 +37,13 @@ const TicketUpdateForm = ({ticket}: { ticket: Ticket }) => {
       <div className="flex gap-x-2 mb-1">
         <div className="w-1/2">
           <Label htmlFor="deadline" className="mb-2 -mt-2">Deadline</Label>
-          <Input type="date" id="deadline" name="deadline"/>
+          <DatePicker 
+            name="deadline" 
+            id="deadline"
+            // key={formState.timestamp}
+            imperativeHandleRef={imperativeHandleRef}
+            defaultValue={formState.payload?.get('deadline') as string ?? ticket.deadline}  
+          />
           <ErrorMessage formState={formState} name="deadline"/>
         </div>
 

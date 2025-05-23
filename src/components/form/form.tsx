@@ -6,14 +6,17 @@ import {ActionState} from "@/utils/formUtils";
 type FormProps = {
   action: (formData: FormData)=>void,
   children: React.ReactNode,
-  actionState: ActionState  
+  actionState: ActionState,
+  onSuccess?: () => void,
+  onError?: () => void, 
 }
 
-const Form = ({action, actionState, children}:FormProps ) => {
+const Form = ({action, actionState, children, onSuccess}:FormProps ) => {
 
   const options = useMemo(() => ({
     onSuccess: ({actionState}:{ actionState: ActionState }) => {
       toast.success(actionState.message)
+      onSuccess?.()
     },
     onError: ({actionState}: { actionState: ActionState }) => {
       if (actionState.message) toast.error(actionState.message)
