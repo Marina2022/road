@@ -7,7 +7,7 @@ import {CalendarIcon} from "lucide-react";
 import {cn} from "@/lib/utils"
 
 import {format} from "date-fns"
-// import {Calendar} from "@/components/ui/calendar";
+import {Calendar} from "@/components/ui/calendar";
 import {useImperativeHandle} from "react";
 
 type DatePickerProps = {
@@ -51,15 +51,15 @@ const DatePicker = ({name, id, defaultValue, imperativeHandleRef}: DatePickerPro
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0">
-          {/*<Calendar*/}
-          {/*  mode="single"*/}
-          {/*  selected={date}*/}
-          {/*  onSelect={(value) => {*/}
-          {/*    setDate(value)*/}
-          {/*    setOpen(false)*/}
-          {/*  }}*/}
-          {/*  initialFocus*/}
-          {/*/>*/}
+          <Calendar
+            mode="single"
+            selected={date}
+            onSelect={(value) => {
+              setDate(value)
+              setOpen(false)
+            }}
+            initialFocus
+          />
         </PopoverContent>
       </Popover>
       <input type="hidden" name={name} value={formattedDate}/>
