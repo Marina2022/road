@@ -5,7 +5,7 @@ import {Button} from "@/components/ui/button";
 import {useFormStatus} from "react-dom";
 import {LoaderCircle} from "lucide-react";
 
-const SubmitButton = ({label, className}: { label: string, className:string }) => {
+const SubmitButton = ({label, className = ''}: { label: string, className?:string }) => {
 
   const {pending} = useFormStatus()
 

@@ -8,3 +8,10 @@ export const TICKET_ICONS = {
   OPEN: <DocumentIcon/>,
   IN_PROGRESS: <PencilIcon/>,
 }
+
+
+export const TICKET_LABELS = {
+  DONE: "Done",
+  OPEN: "Open",
+  IN_PROGRESS: "In progress",
+}

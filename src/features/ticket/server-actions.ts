@@ -2,13 +2,14 @@
 
 import {prisma} from "@/lib/prismaClient";
 import {revalidatePath} from "next/cache";
-import {Ticket} from "@prisma/client";
+import {$Enums, Ticket} from "@prisma/client";
 import {cache} from "react";
 import {redirect} from "next/navigation";
 import {z} from "zod";
 import {ActionState, fromErrorToState} from "@/utils/formUtils";
 import {setCookie} from "@/actions/cookies";
 import {fromDollarsToCents, fromDollarsToCentsNoMoneyFormat} from "@/utils/currency";
+import TicketStatus = $Enums.TicketStatus;
 
 export const getTickets = async (): Promise<Ticket[] | null> => {
   try {
@@ -38,7 +39,7 @@ export const getTicket = cache(async (id: number): Promise<Ticket | null> => {
   }
 })
 
-export const deleteTicket = async (id: number): Promise<void> => {
+export const deleteTicket = async (id: number): Promise<void | {message: string}> => {
   try {
     await prisma.ticket.delete(
       {
@@ -47,10 +48,13 @@ export const deleteTicket = async (id: number): Promise<void> => {
         }
       }
     )
-    revalidatePath('/tickets')
+    revalidatePath('/tickets')    
   } catch (err) {
     console.log(err)
+    return {message: 'Deleting error'}
   }
+
+  redirect('/tickets')
 }
 
 
@@ -122,4 +126,26 @@ export const updateTicket = async (id: number, state: ActionState, formData: For
 
   await setCookie({key: 'toast', value: 'Ticket updated'})
   redirect(`/tickets/${id}`)
+}
+
+
+export const updateTicketStatus = async (id: number, status: TicketStatus): Promise<string> => {
+
+  try {
+    
+    await prisma.ticket.update(
+      {
+        data: {status},
+        where: {id}
+      }
+    )
+    revalidatePath('/tickets')
+    
+    return "SUCCESS"
+
+  } catch (err) {
+    console.log(err)
+    return "ERROR"
+  }
+
 }
