@@ -8,7 +8,7 @@ import {getBaseUrl} from "@/utils/testEnv";
 
 export default function Tickets() {
 
-  console.log("mamaaaaaaaaaaa ", getBaseUrl())
+  console.warn("mamaaaaaaaaaaa ", getBaseUrl())
   
   return (
     <div className="w-full  m-auto mt-3">
