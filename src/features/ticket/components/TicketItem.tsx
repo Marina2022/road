@@ -1,6 +1,5 @@
-
 import clsx from "clsx";
-import {MoreVertical, Pencil, SquareArrowOutUpRight, X} from "lucide-react";
+import {MoreVertical, Pencil, SquareArrowOutUpRight} from "lucide-react";
 import Link from "next/link";
 import React from 'react';
 import {Button, buttonVariants} from "@/components/ui/button";
@@ -9,8 +8,6 @@ import {Ticket} from "@prisma/client";
 import {fromCentsToDollars} from "@/utils/currency";
 import TicketMoreMenu from "@/features/ticket/components/TicketMoreMenu";
 import {DropdownMenuTrigger} from "@/components/ui/dropdown-menu";
-import useConfirmDialog from "@/components/shared/Confirm-dialog";
-import {deleteTicket} from "@/features/ticket/server-actions";
 
 
 const TicketItem = ({ticket, editing = false}: { ticket: Ticket, editing?: boolean }) => {
@@ -20,15 +17,6 @@ const TicketItem = ({ticket, editing = false}: { ticket: Ticket, editing?: boole
         <SquareArrowOutUpRight/>
       </Link>
     </Button>
-
-    // const deleteBtn = <form action={deleteTicket.bind(null, Number(ticket.id))}>
-    //   <Button variant="outline">
-    //     <X/>
-    //   </Button>
-    // </form>
-
- 
-    // const deleteBtn = dialogTrigger
 
     const editBtn = <Button variant="outline" asChild>
       <Link prefetch className="text-sm underline" href={`/tickets/${ticket.id}/edit`}>

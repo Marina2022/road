@@ -1,23 +1,21 @@
 'use client'
 
 import React, {useState} from 'react';
-import {LoaderCircle, Trash, X} from "lucide-react";
+import {X} from "lucide-react";
 import {$Enums, Ticket} from "@prisma/client";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuSeparator
 } from "@/components/ui/dropdown-menu";
 import {TICKET_LABELS} from "@/features/ticket/constants";
-import TicketStatus = $Enums.TicketStatus;
 import {deleteTicket, updateTicketStatus} from "@/features/ticket/server-actions";
 import {toast} from "sonner";
-import ConfirmDialog from "@/components/shared/Confirm-dialog";
-import {Button} from "@/components/ui/button";
 import useConfirmDialog from "@/components/shared/Confirm-dialog";
+import {Button} from "@/components/ui/button";
+import TicketStatus = $Enums.TicketStatus;
 
 const TicketMoreMenu = ({ticket, trigger}: { ticket: Ticket, trigger: React.ReactNode }) => {
 

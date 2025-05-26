@@ -35,8 +35,7 @@ const useConfirmDialog = ({
   const dialogTrigger = cloneElement(trigger, 
     {
       onClick: ()=>  setOpen(true)
-    }) 
-        
+    })         
 
   const dialog = <AlertDialog open={open} onOpenChange={setOpen}>
     <AlertDialogContent>
