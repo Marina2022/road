@@ -53,7 +53,7 @@ export const deleteTicket = async (id: number): Promise<void | {message: string}
     console.log(err)
     return {message: 'Deleting error'}
   }
-  // redirect('/tickets')
+   redirect('/tickets')
 }
 
 
