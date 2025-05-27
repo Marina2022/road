@@ -1,6 +1,6 @@
 import React from 'react';
 import TicketItem from "@/features/ticket/components/TicketItem";
-import {getTickets} from "@/features/ticket/server-actions";
+import {getTickets} from "@/features/ticket/ticketActions";
 
 const TicketsList = async() => {
 

@@ -28,17 +28,17 @@ export default function RootLayout({
 }>) {
   return (
 
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning className="h-full">
 
     <body
-      className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} antialiased h-full`}
     >
 
     <Providers>
       <header className="border-b-slate-100 border-b-1">
         <Header/>
       </header>
-      <main className="max-w-4/5 mx-auto pt-5">
+      <main className="max-w-4/5 mx-auto pt-5 h-[calc(100%-63px)]">
         {children}
       </main>
     </Providers>

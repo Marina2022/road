@@ -11,7 +11,7 @@ import {
   DropdownMenuSeparator
 } from "@/components/ui/dropdown-menu";
 import {TICKET_LABELS} from "@/features/ticket/constants";
-import {deleteTicket, updateTicketStatus} from "@/features/ticket/server-actions";
+import {deleteTicket, updateTicketStatus} from "@/features/ticket/ticketActions";
 import {toast} from "sonner";
 import useConfirmDialog from "@/components/shared/Confirm-dialog";
 import {Button} from "@/components/ui/button";

@@ -11,7 +11,7 @@ const ErrorMessage = ({formState, name}: ErrorMessageProps) => {
   const message = formState?.fieldErrors?.[name]?.[0]
   
   return (
-      <p className="text-red-500">{message} </p>    
+      <p className="text-red-500 text-sm -mt-2">{message} </p>    
   );
 };
 

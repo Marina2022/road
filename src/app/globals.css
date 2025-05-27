@@ -10,6 +10,7 @@
     --font-mono: var(--font-geist-mono);
 
     --animate-fade-in: fade-in 1s ease-in-out;
+    --animate-header-from-top: header-from-top .5s ease-in-out;
 
     --color-sidebar-ring: var(--sidebar-ring);
 
@@ -78,6 +79,18 @@
             transform: translateY(-0)
         }
     }
+
+    @keyframes header-from-top {
+        0% {            
+            transform: translateY(-100%);
+            opacity: 0;       
+        }
+        100% {            
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+    
     --radius-sm: calc(var(--radius) - 4px);
     --radius-md: calc(var(--radius) - 2px);
     --radius-lg: var(--radius);

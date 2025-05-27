@@ -4,7 +4,7 @@ import React, {useActionState, useRef} from 'react';
 import {Label} from "@/components/ui/label";
 import {Textarea} from "@/components/ui/textarea";
 import {Input} from "@/components/ui/input";
-import {updateTicket} from "@/features/ticket/server-actions";
+import {updateTicket} from "@/features/ticket/ticketActions";
 import {Ticket} from "@prisma/client";
 import SubmitButton from "@/components/form/SubmitButton";
 import ErrorMessage from "@/components/form/error-message";

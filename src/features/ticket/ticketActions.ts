@@ -8,14 +8,23 @@ import {redirect} from "next/navigation";
 import {z} from "zod";
 import {ActionState, fromErrorToState} from "@/utils/formUtils";
 import {setCookie} from "@/actions/cookies";
-import {fromDollarsToCents, fromDollarsToCentsNoMoneyFormat} from "@/utils/currency";
+import {fromDollarsToCentsNoMoneyFormat} from "@/utils/currency";
+import {getAuth} from "@/features/auth/authActions";
 import TicketStatus = $Enums.TicketStatus;
+import {isOwner} from "@/utils/authUtils";
 
-export const getTickets = async (): Promise<Ticket[] | null> => {
+export const getTickets = async () => {
   try {
     return await prisma.ticket.findMany({
       orderBy: {
         updatedAt: 'desc'
+      },
+      include: {
+        user: {
+          select: {
+            username: true,
+          }
+        }
       }
     })
   } catch (err) {
@@ -24,12 +33,19 @@ export const getTickets = async (): Promise<Ticket[] | null> => {
   }
 }
 
-export const getTicket = cache(async (id: number): Promise<Ticket | null> => {
+export const getTicket = cache(async (id: number) => {
   try {
     return await prisma.ticket.findFirst(
       {
         where: {
           id: id
+        },
+        include: {
+          user: {
+            select: {
+              username: true,
+            }
+          }
         }
       }
     )
@@ -39,7 +55,7 @@ export const getTicket = cache(async (id: number): Promise<Ticket | null> => {
   }
 })
 
-export const deleteTicket = async (id: number): Promise<void | {message: string}> => {
+export const deleteTicket = async (id: number): Promise<void | { message: string }> => {
   try {
     await prisma.ticket.delete(
       {
@@ -48,14 +64,13 @@ export const deleteTicket = async (id: number): Promise<void | {message: string}
         }
       }
     )
-    revalidatePath('/tickets')    
+    revalidatePath('/tickets')
   } catch (err) {
     console.log(err)
     return {message: 'Deleting error'}
   }
-   redirect('/tickets')
+  redirect('/tickets')
 }
-
 
 const updateTicketSchema = z.object({
   title: z.string().min(1).max(191),
@@ -64,20 +79,20 @@ const updateTicketSchema = z.object({
   bounty: z.coerce.number().positive()
 })
 
-
 export const createTicket = async (state: ActionState, formData: FormData): Promise<ActionState> => {
+
+  const {user} = await getAuth()
+  if (!user) return fromErrorToState(new Error('User is not authenticated'), formData)
 
   const title = formData.get('title') as string
   const content = formData.get('content') as string
   const deadline = formData.get('deadline') as string
   const bounty = formData.get('bounty')
 
-
   try {
     const data = updateTicketSchema.parse({title, content, deadline, bounty})
+    const dataForDB = {...data, bounty: fromDollarsToCentsNoMoneyFormat(data.bounty), userId: user.id}
 
-    const dataForDB = {...data, bounty: fromDollarsToCentsNoMoneyFormat(data.bounty) }
-    
     await prisma.ticket.create(
       {
         data: dataForDB
@@ -104,12 +119,18 @@ export const updateTicket = async (id: number, state: ActionState, formData: For
   const deadline = formData.get('deadline') as string
   const bounty = formData.get('bounty')
 
+  const {user} = await getAuth()
+  if (!user) return fromErrorToState(new Error('No auth'), formData)
+  const ticket = await getTicket(id)
+  if (!ticket) return fromErrorToState(new Error('No ticket'), formData)
+
+  
+  if (!isOwner({user, entity: ticket})) return fromErrorToState(new Error('Not owner!'), formData)
+  
 
   try {
     const data = updateTicketSchema.parse({title, content, deadline, bounty})
-
-    const dataForDB = {...data, bounty: fromDollarsToCentsNoMoneyFormat(data.bounty) }
-
+    const dataForDB = {...data, bounty: fromDollarsToCentsNoMoneyFormat(data.bounty)}
     await prisma.ticket.update(
       {
         data: dataForDB,
@@ -127,11 +148,8 @@ export const updateTicket = async (id: number, state: ActionState, formData: For
   redirect(`/tickets/${id}`)
 }
 
-
 export const updateTicketStatus = async (id: number, status: TicketStatus): Promise<string> => {
-
   try {
-    
     await prisma.ticket.update(
       {
         data: {status},
@@ -139,12 +157,10 @@ export const updateTicketStatus = async (id: number, status: TicketStatus): Prom
       }
     )
     revalidatePath('/tickets')
-    
     return "SUCCESS"
 
   } catch (err) {
     console.log(err)
     return "ERROR"
   }
-
 }

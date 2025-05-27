@@ -1,8 +1,6 @@
 import React from 'react';
 import TicketItem from "@/features/ticket/components/TicketItem";
-import {getTicket, getTickets} from "@/features/ticket/server-actions";
-import {getCookie} from "@/actions/cookies";
-import RedirectToaster from "@/components/shared/RedirectToaster";
+import {getTicket, getTickets} from "@/features/ticket/ticketActions";
 
 
 interface TicketPageProps {

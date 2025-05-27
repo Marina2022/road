@@ -4,7 +4,7 @@ import React, {useActionState, useRef} from 'react';
 import {Label} from "@/components/ui/label";
 import {Textarea} from "@/components/ui/textarea";
 import {Input} from "@/components/ui/input";
-import {createTicket} from "@/features/ticket/server-actions";
+import {createTicket} from "@/features/ticket/ticketActions";
 import SubmitButton from "@/components/form/SubmitButton";
 import {EMPTY_STATE} from "@/utils/formUtils";
 import Form from "@/components/form/form";

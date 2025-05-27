@@ -4,12 +4,9 @@ import React, {Suspense} from "react";
 import Loader from "@/components/shared/Loader";
 import CardCompact from "@/components/shared/Card-compact";
 import TicketCreateForm from "@/features/ticket/components/TicketCreateForm";
-import {getBaseUrl} from "@/utils/testEnv";
 
 export default function Tickets() {
-
-  console.warn("mamaaaaaaaaaaa ", getBaseUrl())
-  
+ 
   return (
     <div className="w-full  m-auto mt-3">
       <Heading title="Tickets" text="All your tickets in one place"/>

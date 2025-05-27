@@ -10,7 +10,7 @@ const SubmitButton = ({label, className = ''}: { label: string, className?:strin
   const {pending} = useFormStatus()
 
   return (
-    <Button className={className} type="submit">{pending ? <LoaderCircle className="animate-spin"/> : label}</Button>
+    <Button variant="default" className={className} type="submit">{pending ? <LoaderCircle className="animate-spin"/> : label}</Button>
   );
 };
 
