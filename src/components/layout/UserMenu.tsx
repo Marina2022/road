@@ -1,12 +1,17 @@
+'use client'
+
 import React from 'react';
 import {signOut} from "@/features/auth/authActions";
 import Link from "next/link";
 import {buttonVariants} from "@/components/ui/button";
 import SubmitButton from "@/components/form/SubmitButton";
-import { User } from 'lucia';
+import {useAuth} from "@/hooks/use-auth";
 
 
-const UserMenu = ({user}:{user: User | null}) => {
+const UserMenu = () => {
+
+  const {user} = useAuth()
+  
   return (
     <div className="min-w-[200px] flex justify-end gap-2">
 
