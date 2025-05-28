@@ -7,10 +7,12 @@ import {getAuth} from "@/features/auth/authActions";
 const Header = async () => {
   
   const auth = await getAuth()
+
   
   return (
-    // <nav className={`flex justify-between p-2 max-w-4/5 mx-auto ${shouldAnimate ? 'animate-header-from-top' : '-translate-y-full'}`}>
     <nav className="flex justify-between p-2 max-w-4/5 mx-auto">
+    {/*<nav className="flex justify-between p-2 max-w-4/5 mx-auto animate-header-from-top">*/}
+    {/*<nav className="flex justify-between p-2 max-w-4/5 mx-auto">*/}
       <Button asChild variant="outline">
         <Link href="/">Home</Link>
       </Button>

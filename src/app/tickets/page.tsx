@@ -4,12 +4,11 @@ import React, {Suspense} from "react";
 import Loader from "@/components/shared/Loader";
 import CardCompact from "@/components/shared/Card-compact";
 import TicketCreateForm from "@/features/ticket/components/TicketCreateForm";
-import {getAuthOrRedirect} from "@/utils/authUtils";
+import RedirectToaster from "@/components/shared/RedirectToaster";
 
 export default async function Tickets() {
 
-  await getAuthOrRedirect()  
-  
+   
   
   return (
     <div className="w-full  m-auto mt-3">
@@ -23,6 +22,7 @@ export default async function Tickets() {
       <Suspense fallback={<Loader/>}>
         <TicketsList/>
       </Suspense>
+      <RedirectToaster/>
     </div>
   )
 }

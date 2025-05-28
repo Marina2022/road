@@ -4,6 +4,7 @@ import {getTicket, getTickets} from "@/features/ticket/ticketActions";
 import {getAuth} from "@/features/auth/authActions";
 import {getAuthOrRedirect, isOwner} from '@/utils/authUtils';
 import {notFound} from "next/navigation";
+import RedirectToaster from "@/components/shared/RedirectToaster";
 
 
 interface TicketPageProps {
@@ -15,18 +16,21 @@ interface TicketPageProps {
 const Page = async ({params}: TicketPageProps) => {
 
   await getAuthOrRedirect()
-    
+
   const {ticketId} = await params;
   const ticket = await getTicket(Number(ticketId))
 
-  if ( !ticket) {
+  if (!ticket) {
     notFound()
   }
 
   return (
-    <div className="w-4/5 m-auto mt-3">
-      <TicketItem ticket={ticket} editing={true}/>
-    </div>
+    <>
+      <div className="w-4/5 m-auto mt-3">
+        <TicketItem ticket={ticket} editing={true}/>
+      </div>
+      <RedirectToaster/>
+    </>
   )
 }
 

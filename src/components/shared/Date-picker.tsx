@@ -25,7 +25,6 @@ const DatePicker = ({name, id, defaultValue, imperativeHandleRef}: DatePickerPro
   useImperativeHandle(imperativeHandleRef,
     () => ({
       reset: () => {
-        console.log('сетаю')
         setDate(new Date())
       }
     }))
