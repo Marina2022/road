@@ -2,8 +2,11 @@ import Link from "next/link";
 import {Button, buttonVariants} from "@/components/ui/button";
 import ToggleTheme from './ToggleTheme';
 import UserMenu from "@/components/layout/UserMenu";
+import {getAuth} from "@/features/auth/authActions";
 
-const Header = () => {
+const Header = async () => {
+  
+  const auth = await getAuth()
   
   return (
     // <nav className={`flex justify-between p-2 max-w-4/5 mx-auto ${shouldAnimate ? 'animate-header-from-top' : '-translate-y-full'}`}>
@@ -14,7 +17,7 @@ const Header = () => {
       <div className="flex gap-2 items-center">
         <ToggleTheme/>
         <Link className={buttonVariants({variant: 'default'})} href="/tickets">Tickets</Link>
-        <UserMenu />
+        <UserMenu user={auth.user} />
       </div>
     </nav>
   );
