@@ -13,9 +13,18 @@ import {getAuth} from "@/features/auth/authActions";
 import TicketStatus = $Enums.TicketStatus;
 import {getAuthOrRedirect, isOwner} from "@/utils/authUtils";
 
-export const getTickets = async () => {
+
+export const getTickets = async (params?:{ownTickets:boolean}) => {
+    
+  const ownTickets = params?.ownTickets;
+  const {user} = await getAuth();
+  if (!user) return null
+  
   try {
     return await prisma.ticket.findMany({
+      where: {
+        ...(ownTickets ? { userId: user.id } : {}), // если ownTickets true — фильтруем по userId, иначе пропускаем  - это обычный спред-оператор
+      },
       orderBy: {
         updatedAt: 'desc'
       },

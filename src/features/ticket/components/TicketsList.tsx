@@ -2,9 +2,9 @@ import React from 'react';
 import TicketItem from "@/features/ticket/components/TicketItem";
 import {getTickets} from "@/features/ticket/ticketActions";
 
-const TicketsList = async() => {
+const TicketsList = async({ownTickets}:{ownTickets: boolean}  ) => {
 
-  const tickets = await getTickets();
+  const tickets = await getTickets({ownTickets});
   
   if (!tickets) return null
   

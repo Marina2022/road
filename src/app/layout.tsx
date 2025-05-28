@@ -1,12 +1,11 @@
 import "./globals.css";
 import type {Metadata} from "next";
 import {Geist, Geist_Mono} from "next/font/google";
-import Header from "@/components/layout/Header";
+import Header from "@/components/layout/header/Header";
 import Providers from "@/providers";
 import React from "react";
-import RedirectToaster from "@/components/shared/RedirectToaster";
-import {ErrorBoundary} from "react-error-boundary";
-import {getAuthOrRedirect} from "@/utils/authUtils";
+import Sidebar from "@/components/layout/sidebar/components/sidebar";
+import {getAuth} from "@/features/auth/authActions";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,22 +27,25 @@ export default async function RootLayout({
                                          }: Readonly<{
   children: React.ReactNode;
 }>) {
+  
+  const {user} = await getAuth()
 
   return (
 
     <html lang="en" suppressHydrationWarning className="h-full">
-
     <body
       className={`${geistSans.variable} ${geistMono.variable} antialiased h-full`}
     >
 
     <Providers>
 
-      <ErrorBoundary fallback={<div>Something went wrong</div>}>
-        <header className="border-b-slate-100 border-b-1">
-          <Header/>
-        </header>
-      </ErrorBoundary>
+      {
+        user && <Sidebar />
+      }
+      
+      <header className="border-b-slate-100 border-b-1">
+        <Header/>
+      </header>      
       <main className="max-w-4/5 mx-auto pt-5 h-[calc(100%-63px)]">
         {children}
       </main>

@@ -1,8 +1,7 @@
 import React from 'react';
 import TicketItem from "@/features/ticket/components/TicketItem";
 import {getTicket, getTickets} from "@/features/ticket/ticketActions";
-import {getAuth} from "@/features/auth/authActions";
-import {getAuthOrRedirect, isOwner} from '@/utils/authUtils';
+import {getAuthOrRedirect} from '@/utils/authUtils';
 import {notFound} from "next/navigation";
 import RedirectToaster from "@/components/shared/RedirectToaster";
 
@@ -15,6 +14,7 @@ interface TicketPageProps {
 
 const Page = async ({params}: TicketPageProps) => {
 
+   
   await getAuthOrRedirect()
 
   const {ticketId} = await params;

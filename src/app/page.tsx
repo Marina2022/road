@@ -1,18 +1,15 @@
-'use client'
-
 import Heading from "@/components/shared/Heading";
-import {Button} from "@/components/ui/button";
+import TicketsList from "@/features/ticket/components/TicketsList";
 
 
 export default function Home() {
 
 
   return (
-    <div>
-      <Heading title="Home page" text="Just Home page"/>
-      <Button>
-        Staaart
-      </Button>
+    <div className="flex flex-col items-center justify-center ">
+      <Heading title="All Tickets" text="Tickets by everyone in one place"/>
+      
+      <TicketsList ownTickets={false} />
     </div>
   )
 }

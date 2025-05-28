@@ -8,6 +8,8 @@ import {Prisma} from "@prisma/client";
 import {fromCentsToDollars} from "@/utils/currency";
 import TicketMoreMenu from "@/features/ticket/components/TicketMoreMenu";
 import {DropdownMenuTrigger} from "@/components/ui/dropdown-menu";
+import {getAuth} from "@/features/auth/authActions";
+import {isOwner} from "@/utils/authUtils";
 
 type TicketItemProps = {
   ticket: Prisma.TicketGetPayload<{ include: {user: {
@@ -18,21 +20,24 @@ type TicketItemProps = {
   editing?: boolean
 }
 
-const TicketItem = ({ticket, editing = false}: TicketItemProps) => {
+const TicketItem = async({ticket, editing = false}: TicketItemProps) => {
 
+  const {user} = await getAuth()
+  const isUserOwner = isOwner(user, ticket)
+  
     const goBtn = <Button variant="outline" asChild>
       <Link prefetch className="text-sm underline" href={`/tickets/${ticket.id}`}>
         <SquareArrowOutUpRight/>
       </Link>
     </Button>
 
-    const editBtn = <Button variant="outline" asChild>
+    const editBtn = isUserOwner ? <Button variant="outline" asChild>
       <Link prefetch className="text-sm underline" href={`/tickets/${ticket.id}/edit`}>
         <Pencil/>
       </Link>
-    </Button>
+    </Button> : null
 
-    const moreMenu = <TicketMoreMenu
+    const moreMenu = isUserOwner ? <TicketMoreMenu
       ticket={ticket}
       trigger={
         <DropdownMenuTrigger>
@@ -43,7 +48,7 @@ const TicketItem = ({ticket, editing = false}: TicketItemProps) => {
           </div>
         </DropdownMenuTrigger>
       }
-    />
+    /> : null
 
     return (
       <>
@@ -69,8 +74,7 @@ const TicketItem = ({ticket, editing = false}: TicketItemProps) => {
           <div className="flex flex-col gap-2">
             {
               editing ?
-                <>
-                  {/*{deleteBtn}*/}
+                <>                  
                   {editBtn}
                   {moreMenu}
                 </>

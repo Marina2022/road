@@ -1,7 +1,7 @@
 import Link from "next/link";
 import {Button, buttonVariants} from "@/components/ui/button";
 import ToggleTheme from './ToggleTheme';
-import UserMenu from "@/components/layout/UserMenu";
+import UserMenu from "@/components/layout/header/UserMenu";
 import {getAuth} from "@/features/auth/authActions";
 
 const Header = async () => {
@@ -10,15 +10,12 @@ const Header = async () => {
 
   
   return (
-    <nav className="flex justify-between p-2 max-w-4/5 mx-auto">
-    {/*<nav className="flex justify-between p-2 max-w-4/5 mx-auto animate-header-from-top">*/}
-    {/*<nav className="flex justify-between p-2 max-w-4/5 mx-auto">*/}
+    <nav className="flex justify-between p-2 max-w-4/5 mx-auto">    
       <Button asChild variant="outline">
-        <Link href="/">Home</Link>
+        <Link href="/public">Home</Link>
       </Button>
       <div className="flex gap-2 items-center">
-        <ToggleTheme/>
-        <Link className={buttonVariants({variant: 'default'})} href="/tickets">Tickets</Link>
+        <ToggleTheme/>        
         <UserMenu user={auth.user} />
       </div>
     </nav>
