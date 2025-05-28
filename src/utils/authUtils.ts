@@ -7,6 +7,7 @@ export const getAuthOrRedirect = async () => {
   
   if (!auth.user) {
     redirect('/sign-in')
+    
   }
   return auth
 }

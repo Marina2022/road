@@ -8,7 +8,8 @@ import {getAuthOrRedirect} from "@/utils/authUtils";
 
 export default async function Tickets() {
 
-  await getAuthOrRedirect()
+  await getAuthOrRedirect()  
+  
   
   return (
     <div className="w-full  m-auto mt-3">

@@ -5,6 +5,7 @@ import Header from "@/components/layout/Header";
 import Providers from "@/providers";
 import React from "react";
 import RedirectToaster from "@/components/shared/RedirectToaster";
+import {ErrorBoundary} from "react-error-boundary";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,9 +27,8 @@ export default function RootLayout({
                                    }: Readonly<{
   children: React.ReactNode;
 }>) {
-  
-  
-  
+
+
   return (
 
     <html lang="en" suppressHydrationWarning className="h-full">
@@ -36,16 +36,19 @@ export default function RootLayout({
     <body
       className={`${geistSans.variable} ${geistMono.variable} antialiased h-full`}
     >
+   
+      <Providers>
 
-    <Providers>
-      <header className="border-b-slate-100 border-b-1">
-        <Header/>
-      </header>
-      <main className="max-w-4/5 mx-auto pt-5 h-[calc(100%-63px)]">
-        {children}
-      </main>
-    </Providers>
-    <RedirectToaster />
+        <ErrorBoundary fallback={<div>Something went wrong</div>}>
+        <header className="border-b-slate-100 border-b-1">
+          <Header/>
+        </header>
+        </ErrorBoundary>
+        <main className="max-w-4/5 mx-auto pt-5 h-[calc(100%-63px)]">
+          {children}
+        </main>
+      </Providers>
+        {/*<RedirectToaster/>*/}
     </body>
     </html>
   )
