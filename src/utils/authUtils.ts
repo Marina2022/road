@@ -14,12 +14,9 @@ export const getAuthOrRedirect = async () => {
 
 
 
-
-
 type Entity = {
   userId: string | undefined;
 }
-
 
 export const isOwner = (user: User | null | undefined, entity: Entity | null | undefined) => {
   if (!entity || !user) return false

@@ -11,6 +11,7 @@ import {setCookie} from "@/actions/cookies";
 import {fromDollarsToCentsNoMoneyFormat} from "@/utils/currency";
 import {getAuth} from "@/features/auth/authActions";
 import TicketStatus = $Enums.TicketStatus;
+import {getAuthOrRedirect, isOwner} from "@/utils/authUtils";
 
 export const getTickets = async () => {
   try {
@@ -54,7 +55,15 @@ export const getTicket = cache(async (id: number) => {
   }
 })
 
-export const deleteTicket = async (id: number): Promise<void | { message: string }> => {
+export const deleteTicket = async (id: number): Promise<ActionState > => {
+
+  const formData = new FormData() // заглушка
+  
+  const {user} = await getAuthOrRedirect()
+  if (!isOwner(user, await getTicket(id))) {
+    return fromErrorToState(new Error('Not yours!'), formData)
+  }
+  
   try {
     await prisma.ticket.delete(
       {
@@ -66,7 +75,7 @@ export const deleteTicket = async (id: number): Promise<void | { message: string
     revalidatePath('/tickets')
   } catch (err) {
     console.log(err)
-    return {message: 'Deleting error'}
+    return fromErrorToState(new Error('Deleting error'), formData)    
   }
   redirect('/tickets')
 }
@@ -106,19 +115,20 @@ export const createTicket = async (state: ActionState, formData: FormData): Prom
       status: 'SUCCESS'
     }
   } catch (err) {
-    console.log(err)
     return fromErrorToState(err, formData)
   }
 }
 
 export const updateTicket = async (id: number, state: ActionState, formData: FormData): Promise<ActionState> => {
 
+  const {user} = await getAuthOrRedirect()  
+  if (!isOwner(user, await getTicket(id))) return fromErrorToState(new Error('It is not your ticket'), formData)
+  
   const title = formData.get('title') as string
   const content = formData.get('content') as string
   const deadline = formData.get('deadline') as string
   const bounty = formData.get('bounty')
-  
-  
+    
   try {
     const data = updateTicketSchema.parse({title, content, deadline, bounty})
     const dataForDB = {...data, bounty: fromDollarsToCentsNoMoneyFormat(data.bounty)}
@@ -139,7 +149,10 @@ export const updateTicket = async (id: number, state: ActionState, formData: For
   redirect(`/tickets/${id}`)
 }
 
-export const updateTicketStatus = async (id: number, status: TicketStatus): Promise<string> => {
+export const updateTicketStatus = async (id: number, status: TicketStatus): Promise< string> => {
+  const {user} = await getAuthOrRedirect()  
+  if (!isOwner(user, await getTicket(id))) return "NOT YOURS"
+  
   try {
     await prisma.ticket.update(
       {

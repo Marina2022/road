@@ -1,6 +1,6 @@
 'use client'
 
-import React, {useState} from 'react';
+import React, {useActionState, useState} from 'react';
 import {X} from "lucide-react";
 import {$Enums, Ticket} from "@prisma/client";
 import {
@@ -13,8 +13,9 @@ import {
 import {TICKET_LABELS} from "@/features/ticket/constants";
 import {deleteTicket, updateTicketStatus} from "@/features/ticket/ticketActions";
 import {toast} from "sonner";
-import useConfirmDialog from "@/components/shared/Confirm-dialog";
+import useConfirmDialog from "@/components/shared/useConfirmDialog";
 import {Button} from "@/components/ui/button";
+import {EMPTY_STATE} from "@/utils/formUtils";
 import TicketStatus = $Enums.TicketStatus;
 
 const TicketMoreMenu = ({ticket, trigger}: { ticket: Ticket, trigger: React.ReactNode }) => {
@@ -27,17 +28,23 @@ const TicketMoreMenu = ({ticket, trigger}: { ticket: Ticket, trigger: React.Reac
     const result = await promise
     if (result === "ERROR") {
       toast.error("Error updating ticket status")
+    } else if (result === "NOT YOURS") {
+      toast.error("You have no right to edit this ticket")
     } else {
       setPosition(value as TicketStatus)
     }
   }
 
+  const [actionState, action] = useActionState(deleteTicket.bind(null, Number(ticket.id)), EMPTY_STATE)
+  
   const {dialogTrigger, dialog} = useConfirmDialog({
+    
       trigger: <div className="cursor-pointer">
         <Button variant="outline"> <X/> </Button>
         <span className="ml-4">Delete</span>
-      </div>,
-      action: deleteTicket.bind(null, Number(ticket.id))
+      </div>,    
+      action,
+      actionState
     }
   )
 

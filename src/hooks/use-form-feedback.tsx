@@ -1,4 +1,4 @@
-import {useEffect} from 'react';
+import {useEffect, useRef} from 'react';
 import {ActionState} from "@/utils/formUtils";
 
 type FeedbackOptions = {
@@ -7,14 +7,23 @@ type FeedbackOptions = {
 }
 
 const useFormFeedback = (formState: ActionState, options: FeedbackOptions) => {
-
+  const prevTimestamp = useRef(formState.timestamp)
+  const isUpdate = prevTimestamp.current !== formState.timestamp
+  
   useEffect(() => {
+
+    if (!isUpdate) return
+    
     if (formState.status === 'SUCCESS') {
       options.onSuccess?.({actionState: formState})
-    } else {
+    }
+
+    if (formState.status === 'ERROR') {
       options.onError?.({actionState: formState})
     }
-  }, [formState.status, options, formState])
+    prevTimestamp.current = formState.timestamp
+    
+  }, [formState.status, formState.timestamp, options, formState, isUpdate])
 
 }
 

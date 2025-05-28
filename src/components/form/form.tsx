@@ -11,7 +11,7 @@ type FormProps = {
   onError?: () => void, 
 }
 
-const Form = ({action, actionState, children, onSuccess}:FormProps ) => {
+const Form = ({action, actionState, children, onSuccess, onError}:FormProps ) => {
 
   const options = useMemo(() => ({
     onSuccess: ({actionState}:{ actionState: ActionState }) => {
@@ -20,8 +20,9 @@ const Form = ({action, actionState, children, onSuccess}:FormProps ) => {
     },
     onError: ({actionState}: { actionState: ActionState }) => {
       if (actionState.message) toast.error(actionState.message)
+      onError?.()
     },
-  }), [])
+  }), [onError, onSuccess])
 
   useFormFeedback(actionState, options)
   
