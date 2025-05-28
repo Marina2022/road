@@ -2,7 +2,7 @@
 
 import {prisma} from "@/lib/prismaClient";
 import {revalidatePath} from "next/cache";
-import {$Enums, Ticket} from "@prisma/client";
+import {$Enums} from "@prisma/client";
 import {cache} from "react";
 import {redirect} from "next/navigation";
 import {z} from "zod";
@@ -11,7 +11,6 @@ import {setCookie} from "@/actions/cookies";
 import {fromDollarsToCentsNoMoneyFormat} from "@/utils/currency";
 import {getAuth} from "@/features/auth/authActions";
 import TicketStatus = $Enums.TicketStatus;
-import {isOwner} from "@/utils/authUtils";
 
 export const getTickets = async () => {
   try {
@@ -118,16 +117,8 @@ export const updateTicket = async (id: number, state: ActionState, formData: For
   const content = formData.get('content') as string
   const deadline = formData.get('deadline') as string
   const bounty = formData.get('bounty')
-
-  const {user} = await getAuth()
-  if (!user) return fromErrorToState(new Error('No auth'), formData)
-  const ticket = await getTicket(id)
-  if (!ticket) return fromErrorToState(new Error('No ticket'), formData)
-
   
-  if (!isOwner({user, entity: ticket})) return fromErrorToState(new Error('Not owner!'), formData)
   
-
   try {
     const data = updateTicketSchema.parse({title, content, deadline, bounty})
     const dataForDB = {...data, bounty: fromDollarsToCentsNoMoneyFormat(data.bounty)}

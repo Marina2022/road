@@ -3,7 +3,8 @@ import CardCompact from "@/components/shared/Card-compact";
 import {notFound} from "next/navigation";
 import {getTicket} from "@/features/ticket/ticketActions";
 import TicketUpdateForm from "@/features/ticket/components/TicketUpdateForm";
-import Link from 'next/link';
+import {getAuth} from "@/features/auth/authActions";
+import {getAuthOrRedirect, isOwner} from "@/utils/authUtils";
 
 type PageProps = {
   params: Promise<{
@@ -12,14 +13,18 @@ type PageProps = {
 }
 
 const Page = async({params}:PageProps) => {
+
+  await getAuthOrRedirect()
   
-  const {ticketId} = await params
-  
+  const {user} = await getAuth()
+
+  const {ticketId} = await params;
   const ticket = await getTicket(Number(ticketId))
-  
-  if (!ticket) {
+
+  if (!isOwner(user, ticket) || !ticket) {
     notFound()
   }
+  
   
   return (
     <div className="h-full w-full flex items-center justify-center flex-1">
