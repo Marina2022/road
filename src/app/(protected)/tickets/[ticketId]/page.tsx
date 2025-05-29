@@ -40,14 +40,14 @@ const Page = async ({params}: TicketPageProps) => {
   )
 }
 
-
-export async function generateStaticParams() {
-  const tickets = await getTickets({});
-
-  if (!tickets) return []
-
-  return tickets.map(ticket => ({ticketId: ticket.id.toString()}))
-}
+//
+// export async function generateStaticParams() {
+//   const tickets = await getTickets();
+//
+//   if (!tickets) return []
+//
+//   return tickets.map(ticket => ({ticketId: ticket.id.toString()}))
+// }
 
 
 export default Page;
