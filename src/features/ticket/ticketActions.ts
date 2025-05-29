@@ -10,20 +10,27 @@ import {ActionState, fromErrorToState} from "@/utils/formUtils";
 import {setCookie} from "@/actions/cookies";
 import {fromDollarsToCentsNoMoneyFormat} from "@/utils/currency";
 import {getAuth} from "@/features/auth/authActions";
-import TicketStatus = $Enums.TicketStatus;
 import {getAuthOrRedirect, isOwner} from "@/utils/authUtils";
+import TicketStatus = $Enums.TicketStatus;
 
 
-export const getTickets = async (params?:{ownTickets:boolean}) => {
-    
-  const ownTickets = params?.ownTickets;
-  const {user} = await getAuth();
-  if (!user) return null
-  
+type getTicketsParams = {
+  userId?: string;
+  search?: string;
+}
+
+export const getTickets = async ({userId, search}: getTicketsParams) => {
+
   try {
     return await prisma.ticket.findMany({
       where: {
-        ...(ownTickets ? { userId: user.id } : {}), // если ownTickets true — фильтруем по userId, иначе пропускаем  - это обычный спред-оператор
+        userId,
+        ...(search && {
+          OR: [
+            { title: { contains: search } },
+            { content: { contains: search } }
+          ]
+        })
       },
       orderBy: {
         updatedAt: 'desc'
@@ -64,15 +71,15 @@ export const getTicket = cache(async (id: number) => {
   }
 })
 
-export const deleteTicket = async (id: number): Promise<ActionState > => {
+export const deleteTicket = async (id: number): Promise<ActionState> => {
 
   const formData = new FormData() // заглушка
-  
+
   const {user} = await getAuthOrRedirect()
   if (!isOwner(user, await getTicket(id))) {
     return fromErrorToState(new Error('Not yours!'), formData)
   }
-  
+
   try {
     await prisma.ticket.delete(
       {
@@ -84,7 +91,7 @@ export const deleteTicket = async (id: number): Promise<ActionState > => {
     revalidatePath('/tickets')
   } catch (err) {
     console.log(err)
-    return fromErrorToState(new Error('Deleting error'), formData)    
+    return fromErrorToState(new Error('Deleting error'), formData)
   }
   redirect('/tickets')
 }
@@ -130,14 +137,14 @@ export const createTicket = async (state: ActionState, formData: FormData): Prom
 
 export const updateTicket = async (id: number, state: ActionState, formData: FormData): Promise<ActionState> => {
 
-  const {user} = await getAuthOrRedirect()  
+  const {user} = await getAuthOrRedirect()
   if (!isOwner(user, await getTicket(id))) return fromErrorToState(new Error('It is not your ticket'), formData)
-  
+
   const title = formData.get('title') as string
   const content = formData.get('content') as string
   const deadline = formData.get('deadline') as string
   const bounty = formData.get('bounty')
-    
+
   try {
     const data = updateTicketSchema.parse({title, content, deadline, bounty})
     const dataForDB = {...data, bounty: fromDollarsToCentsNoMoneyFormat(data.bounty)}
@@ -158,10 +165,10 @@ export const updateTicket = async (id: number, state: ActionState, formData: For
   redirect(`/tickets/${id}`)
 }
 
-export const updateTicketStatus = async (id: number, status: TicketStatus): Promise< string> => {
-  const {user} = await getAuthOrRedirect()  
+export const updateTicketStatus = async (id: number, status: TicketStatus): Promise<string> => {
+  const {user} = await getAuthOrRedirect()
   if (!isOwner(user, await getTicket(id))) return "NOT YOURS"
-  
+
   try {
     await prisma.ticket.update(
       {

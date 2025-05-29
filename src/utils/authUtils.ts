@@ -6,12 +6,10 @@ export const getAuthOrRedirect = async () => {
   const auth = await getAuth()
   
   if (!auth.user) {
-    redirect('/sign-in')
-    
+    redirect('/sign-in')    
   }
   return auth
 }
-
 
 
 type Entity = {

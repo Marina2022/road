@@ -7,7 +7,6 @@ const Page = () => {
   
   return (
     <Heading title="Profile" text="Profile info" tabs={
-
       <AccountTabs defaultValue="profile" />
     } />
   );

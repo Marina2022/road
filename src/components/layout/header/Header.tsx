@@ -1,5 +1,5 @@
 import Link from "next/link";
-import {Button, buttonVariants} from "@/components/ui/button";
+import {Button} from "@/components/ui/button";
 import ToggleTheme from './ToggleTheme';
 import UserMenu from "@/components/layout/header/UserMenu";
 import {getAuth} from "@/features/auth/authActions";
@@ -12,7 +12,7 @@ const Header = async () => {
   return (
     <nav className="flex justify-between p-2 max-w-4/5 mx-auto">    
       <Button asChild variant="outline">
-        <Link href="/public">Home</Link>
+        <Link href="/">Home</Link>
       </Button>
       <div className="flex gap-2 items-center">
         <ToggleTheme/>        

@@ -1,15 +1,18 @@
 import Heading from "@/components/shared/Heading";
 import TicketsList from "@/features/ticket/components/TicketsList";
 
+type HomeProps = {
+  searchParams: Promise<{ search?: string }>
+}
 
-export default function Home() {
-
+export default async function Home({searchParams}: HomeProps) {
+  const {search} = await searchParams
 
   return (
     <div className="flex flex-col items-center justify-center ">
       <Heading title="All Tickets" text="Tickets by everyone in one place"/>
       
-      <TicketsList ownTickets={false} />
+      <TicketsList search={search} />
     </div>
   )
 }

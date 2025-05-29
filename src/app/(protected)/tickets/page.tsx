@@ -5,11 +5,18 @@ import Loader from "@/components/shared/Loader";
 import CardCompact from "@/components/shared/Card-compact";
 import TicketCreateForm from "@/features/ticket/components/TicketCreateForm";
 import RedirectToaster from "@/components/shared/RedirectToaster";
-import {getAuthOrRedirect} from "@/utils/authUtils";
+import {getAuth} from "@/features/auth/authActions";
 
-export default async function Tickets() {
+type TicketsProps = {
+  searchParams: Promise<{ search?: string }>
+}
 
-  await getAuthOrRedirect()
+export default async function Tickets({searchParams}: TicketsProps) {
+  
+  const {user} = await getAuth()
+  if (!user) return null
+  
+  const {search} = await searchParams
   
   return (
     <div className="flex flex-col items-center justify-center ">
@@ -21,7 +28,7 @@ export default async function Tickets() {
                    content={<TicketCreateForm/>}/>
 
       <Suspense fallback={<Loader/>}>
-        <TicketsList ownTickets={true}/>
+        <TicketsList userId={user.id} search={search} />
       </Suspense>
       <RedirectToaster/>
     </div>

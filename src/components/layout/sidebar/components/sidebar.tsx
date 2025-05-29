@@ -4,6 +4,7 @@ import React, {useState} from 'react';
 import {navItems} from "@/components/layout/sidebar/side-bar-consts";
 import SidebarItem from "@/components/layout/sidebar/components/sidebar-item";
 import {cn} from "@/lib/utils";
+import {getClosestString} from "@/utils/levenstein";
 
 const Sidebar = () => {
   
@@ -15,7 +16,9 @@ const Sidebar = () => {
     setOpen(open);
     // setTimeout(() => setTransition(false), 200)
   }
+
  
+  const allLinks = navItems.map((navItem) => navItem.href)
   
   return (
     <nav
@@ -31,7 +34,7 @@ const Sidebar = () => {
         <nav className="space-y-2">
           {
             navItems.map((navItem) => (
-              <SidebarItem key={navItem.title} isOpen={isOpen} navItem={navItem}/>
+              <SidebarItem key={navItem.title} isOpen={isOpen} navItem={navItem} allLinks={allLinks} />
             ))
           }
         </nav>

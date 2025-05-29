@@ -13,9 +13,7 @@ type PageProps = {
 }
 
 const Page = async({params}:PageProps) => {
-
-  await getAuthOrRedirect()
-  
+ 
   const {user} = await getAuth()
 
   const {ticketId} = await params;

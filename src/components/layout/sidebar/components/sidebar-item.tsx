@@ -5,15 +5,30 @@ import Link from 'next/link';
 import {buttonVariants} from "@/components/ui/button";
 import {cn} from "@/lib/utils";
 import {Separator} from "@/components/ui/separator";
+import {getClosestString} from "@/utils/levenstein";
 
 type SidebarItemProps = {
   isOpen: boolean;
   navItem: NavItem;
+  allLinks: string[];
 }
 
-const SidebarItem = ({isOpen, navItem}: SidebarItemProps) => {
+const SidebarItem = ({isOpen, navItem, allLinks}: SidebarItemProps) => {
+  
+  const pathsToIgnore = ['/sign-in', '/sign-up', 'forgot-password'];
+
   const path = usePathname()
-  const isActive = path === navItem.href
+  let isActive
+  
+  if (pathsToIgnore.find(item =>item === path)) {
+    isActive = false
+  }  else {
+    const closest = getClosestString(path, allLinks)
+    isActive = closest === navItem.href  
+  }
+  
+    
+  
 
   return (
     <>
@@ -25,7 +40,8 @@ const SidebarItem = ({isOpen, navItem}: SidebarItemProps) => {
         className={cn(
           buttonVariants({variant: "ghost"}),
           "group relative flex h-12 justify-start",
-          isActive && "bg-muted font-bold hover:bg-muted"
+          isActive && "bg-muted font-bold hover:bg-muted",
+          !isOpen && "w-[40px]"
         )}
       >
         {cloneElement(navItem.icon, {
