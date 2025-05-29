@@ -41,7 +41,6 @@ const AccountDropdown = ({user}: { user: User }) => {
             <span>Password</span>
           </Link>
         </DropdownMenuItem>
-
         <DropdownMenuSeparator/>
         <DropdownMenuItem
           onSelect={(e) => {

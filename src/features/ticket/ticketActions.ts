@@ -12,38 +12,44 @@ import {fromDollarsToCentsNoMoneyFormat} from "@/utils/currency";
 import {getAuth} from "@/features/auth/authActions";
 import {getAuthOrRedirect, isOwner} from "@/utils/authUtils";
 import TicketStatus = $Enums.TicketStatus;
+import {ParsedSearchParams} from "@/features/ticket/search-params";
 
 
 type getTicketsParams = {
   userId?: string;
-  search?: string;
+  searchParams: Awaited<ParsedSearchParams>;
 }
 
-export const getTickets = async ({userId, search}: getTicketsParams) => {
+export const getTickets = async ({userId, searchParams}: getTicketsParams) => {
 
+  console.log('sort = ', searchParams.sort)
+  
   try {
     return await prisma.ticket.findMany({
-      where: {
-        userId,
-        ...(search && {
-          OR: [
-            {title: {contains: search, mode: 'insensitive'}},
-            {content: {contains: search, mode: 'insensitive'}}
-          ]
-        })
-      },
-      orderBy: {
-        updatedAt: 'desc'
-      },
-      include: {
-        user: {
-          select: {
-            username: true,
+        where: {
+          userId,
+          ...(searchParams.search && {
+            OR: [
+              {title: {contains: searchParams.search, mode: 'insensitive'}},
+              {content: {contains: searchParams.search, mode: 'insensitive'}}
+            ]
+          })
+        },
+        orderBy: {
+          ...((searchParams.sort === 'newest')  && {createdAt: 'desc'}),
+          ...(searchParams.sort === 'bounty' && {bounty: 'asc'})
+        },
+        include: {
+          user: {
+            select: {
+              username: true,
+            }
           }
         }
       }
-    })
-  } catch (err) {
+    )
+  } catch
+    (err) {
     console.log(err)
     return null
   }

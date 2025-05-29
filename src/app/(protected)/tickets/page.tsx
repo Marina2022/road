@@ -6,9 +6,11 @@ import CardCompact from "@/components/shared/Card-compact";
 import TicketCreateForm from "@/features/ticket/components/TicketCreateForm";
 import RedirectToaster from "@/components/shared/RedirectToaster";
 import {getAuth} from "@/features/auth/authActions";
+import {SearchParams} from "nuqs/server";
+import {searchParamsCache} from "@/features/ticket/search-params";
 
 type TicketsProps = {
-  searchParams: Promise<{ search?: string }>
+  searchParams: Promise<SearchParams>
 }
 
 export default async function Tickets({searchParams}: TicketsProps) {
@@ -16,7 +18,6 @@ export default async function Tickets({searchParams}: TicketsProps) {
   const {user} = await getAuth()
   if (!user) return null
   
-  const {search} = await searchParams
   
   return (
     <div className="flex flex-col items-center justify-center ">
@@ -28,7 +29,7 @@ export default async function Tickets({searchParams}: TicketsProps) {
                    content={<TicketCreateForm/>}/>
 
       <Suspense fallback={<Loader/>}>
-        <TicketsList userId={user.id} search={search} />
+        <TicketsList userId={user.id} searchParams={searchParamsCache.parse(await searchParams)}  />
       </Suspense>
       <RedirectToaster/>
     </div>
