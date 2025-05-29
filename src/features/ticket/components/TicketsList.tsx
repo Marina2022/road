@@ -18,6 +18,9 @@ const TicketsList = async ({userId, search}: { userId?: string, search?: string 
           )
         }
       </ul>
+      {
+        tickets.length === 0 && <div>No tickets found.</div>
+      }
     </>
   );
 };
