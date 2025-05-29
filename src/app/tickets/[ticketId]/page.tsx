@@ -4,6 +4,7 @@ import {getTicket, getTickets} from "@/features/ticket/ticketActions";
 import {getAuthOrRedirect} from '@/utils/authUtils';
 import {notFound} from "next/navigation";
 import RedirectToaster from "@/components/shared/RedirectToaster";
+import BreadCrumbs from "@/components/shared/BreadCrumbs";
 
 
 interface TicketPageProps {
@@ -13,7 +14,6 @@ interface TicketPageProps {
 }
 
 const Page = async ({params}: TicketPageProps) => {
-
    
   await getAuthOrRedirect()
 
@@ -24,8 +24,17 @@ const Page = async ({params}: TicketPageProps) => {
     notFound()
   }
 
+  const breadcrumbs = [
+    {title: 'Home', href: '/'},
+    {title: 'All Tickets', href: '/tickets'},
+    {title: ticket.title}
+  ]
+  
   return (
     <>
+
+      <BreadCrumbs breadcrumbs={breadcrumbs} />
+      
       <div className="w-4/5 m-auto mt-3">
         <TicketItem ticket={ticket} editing={true}/>
       </div>
@@ -34,13 +43,15 @@ const Page = async ({params}: TicketPageProps) => {
   )
 }
 
-export async function generateStaticParams() {
-  const tickets = await getTickets();
+// внутри getTickets используются куки, которые во время билда заюзать не получицо, поэтому ошибка падает про cookie scope
 
-  if (!tickets) return []
-
-  return tickets.map(ticket => ({ticketId: ticket.id.toString()}))
-}
+// export async function generateStaticParams() {
+//   const tickets = await getTickets();
+//
+//   if (!tickets) return []
+//
+//   return tickets.map(ticket => ({ticketId: ticket.id.toString()}))
+// }
 
 
 export default Page;

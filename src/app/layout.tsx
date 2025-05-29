@@ -6,6 +6,7 @@ import Providers from "@/providers";
 import React from "react";
 import Sidebar from "@/components/layout/sidebar/components/sidebar";
 import {getAuth} from "@/features/auth/authActions";
+import RedirectToaster from "@/components/shared/RedirectToaster";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,7 +28,7 @@ export default async function RootLayout({
                                          }: Readonly<{
   children: React.ReactNode;
 }>) {
-  
+
   const {user} = await getAuth()
 
   return (
@@ -36,19 +37,19 @@ export default async function RootLayout({
     <body
       className={`${geistSans.variable} ${geistMono.variable} antialiased h-full`}
     >
-
     <Providers>
 
-      {
-        user && <Sidebar />
-      }
-      
       <header className="border-b-slate-100 border-b-1">
         <Header/>
-      </header>      
-      <main className="max-w-4/5 mx-auto pt-5 h-[calc(100%-63px)]">
-        {children}
-      </main>
+      </header> 
+      <div>
+        {
+          user ? <Sidebar/> : <div className="w-[78px]"></div>
+        }
+        <main className="max-w-4/5 mx-auto pt-5 h-[calc(100%-63px)]">
+          {children}
+        </main>
+      </div>            
     </Providers>
     </body>
     </html>

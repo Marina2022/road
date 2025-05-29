@@ -6,7 +6,7 @@ import SidebarItem from "@/components/layout/sidebar/components/sidebar-item";
 import {cn} from "@/lib/utils";
 
 const Sidebar = () => {
-
+  
   // const [isTransition, setTransition] = useState(false);
   const [isOpen, setOpen] = useState(false);
 
@@ -15,6 +15,7 @@ const Sidebar = () => {
     setOpen(open);
     // setTimeout(() => setTransition(false), 200)
   }
+ 
   
   return (
     <nav
