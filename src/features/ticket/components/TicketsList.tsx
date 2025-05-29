@@ -19,7 +19,7 @@ const TicketsList = async ({userId, searchParams}: TicketListProps) => {
 
   const options = [
     {
-      label: "Newest",
+      label: "Closest deadline",
       value: "newest",
     },
     {
@@ -32,7 +32,7 @@ const TicketsList = async ({userId, searchParams}: TicketListProps) => {
     <>
       <div className="flex gap-2 w-[520px] ">
         <SearchInput placeholder="Search tickets..."/>
-        <SortTickets defaultValue="newest" options={options}/>
+        <SortTickets options={options}/>
       </div>
       <ul className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-8 animate-fade-in ">
         {

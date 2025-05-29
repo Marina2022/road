@@ -11,8 +11,8 @@ import {setCookie} from "@/actions/cookies";
 import {fromDollarsToCentsNoMoneyFormat} from "@/utils/currency";
 import {getAuth} from "@/features/auth/authActions";
 import {getAuthOrRedirect, isOwner} from "@/utils/authUtils";
-import TicketStatus = $Enums.TicketStatus;
 import {ParsedSearchParams} from "@/features/ticket/search-params";
+import TicketStatus = $Enums.TicketStatus;
 
 
 type getTicketsParams = {
@@ -23,7 +23,7 @@ type getTicketsParams = {
 export const getTickets = async ({userId, searchParams}: getTicketsParams) => {
 
   console.log('sort = ', searchParams.sort)
-  
+
   try {
     return await prisma.ticket.findMany({
         where: {
@@ -36,7 +36,7 @@ export const getTickets = async ({userId, searchParams}: getTicketsParams) => {
           })
         },
         orderBy: {
-          ...((searchParams.sort === 'newest')  && {createdAt: 'desc'}),
+          ...((searchParams.sort === 'newest') && {deadline: 'asc'}),
           ...(searchParams.sort === 'bounty' && {bounty: 'asc'})
         },
         include: {

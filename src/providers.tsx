@@ -1,18 +1,21 @@
-
 import React from 'react';
 import {ThemeProvider} from "next-themes";
 import {Toaster} from "sonner";
+import {NuqsAdapter} from 'nuqs/adapters/next/app'
 
-const Providers = ({children}: {children: React.ReactNode}) => {
+const Providers = ({children}: { children: React.ReactNode }) => {
   return (
+
     <ThemeProvider attribute="class"
                    defaultTheme="system"
                    enableSystem
-                   // disableTransitionOnChange
+      // disableTransitionOnChange
     >
-      {children}
+      <NuqsAdapter>
+        {children}
+      </NuqsAdapter>
 
-      <Toaster expand/>      
+      <Toaster expand/>
     </ThemeProvider>
   );
 };
