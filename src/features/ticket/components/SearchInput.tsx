@@ -12,29 +12,11 @@ type SearchInputProps = {
   placeholder: string;
 }
 
-const SearchInput = ({placeholder}: SearchInputProps) => {
-  
-  
+const SearchInput = ({placeholder}: SearchInputProps) => {   
   const [search, setSearch] = useQueryState("search", searchParser)
-  
-  // const searchParams = useSearchParams();
-  // const params = new URLSearchParams(searchParams);
-  // const {replace}  = useRouter();
-  // const pathname = usePathname();
-  
-  // const value = params.get('search');
-  
+      
   const handleChange = useDebouncedCallback(async(e: React.ChangeEvent<HTMLInputElement>)=>{
-
-    const value = e.target.value;
-
-    // if (value) {
-    //   params.set("search", value);
-    // } else {
-    //   params.delete("search");
-    // }
-    // replace(`${pathname}?${params.toString()}`, {scroll: false})
-
+    const value = e.target.value; 
     await setSearch(value)
   }, 300) 
   
