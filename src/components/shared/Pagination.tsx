@@ -16,7 +16,7 @@ type PaginationProps = {
 
 const Pagination = ({pagination, setPagination, count, hasNext}: PaginationProps) => {
 
-  const pages = Array.from({length: count})
+  const pages = Array.from({length: count / pagination.size + 1})
 
   const handleClick = (index: number) => {
     setPagination({
