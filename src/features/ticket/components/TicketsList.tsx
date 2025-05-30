@@ -16,11 +16,9 @@ type TicketListProps =
 const TicketsList = async ({userId, searchParams}: TicketListProps) => {
 
   const ticketsData = await getTickets({userId, searchParams});
-
   const tickets = ticketsData?.list
   
-  if (!tickets) return null
-
+  
   const options = [
     {
       label: "Closest deadline",
@@ -38,10 +36,9 @@ const TicketsList = async ({userId, searchParams}: TicketListProps) => {
       sortValue: "desc",
     }
   ]
-  
-  if (tickets.length === 0) return <div>No tickets found.</div>
 
-  
+  if (!tickets) return null  
+  if (tickets.length === 0) return <div>No tickets found.</div>  
   
   return (
     <>
