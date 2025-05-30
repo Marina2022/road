@@ -1,38 +1,53 @@
 import React from 'react';
 import TicketItem from "@/features/ticket/components/TicketItem";
 import {getTickets} from "@/features/ticket/ticketActions";
-import SearchInput from "@/features/ticket/components/SearchInput";
-import SortTickets from "@/features/ticket/components/SortTickets";
 import {ParsedSearchParams} from "@/features/ticket/search-params";
+import TicketsSearchInput from "@/features/ticket/components/TicketsSearchInput";
+import TicketsSort from "@/features/ticket/components/TicketsSort";
+import TicketPagination from "@/features/ticket/components/TicketPagination";
 
 type TicketListProps =
   {
     userId?: string,
-    searchParams: Awaited<ParsedSearchParams> 
+    searchParams: Awaited<ParsedSearchParams>
   }
-  
+
+
 const TicketsList = async ({userId, searchParams}: TicketListProps) => {
 
-  const tickets = await getTickets({userId, searchParams});
+  const ticketsData = await getTickets({userId, searchParams});
 
+  const tickets = ticketsData?.list
+  
   if (!tickets) return null
 
   const options = [
     {
       label: "Closest deadline",
-      value: "newest",
+      sortKey: "deadline",
+      sortValue: "desc",
+    },
+    {
+      label: "bounty asc",
+      sortKey: "bounty",
+      sortValue: "asc",
     },
     {
       label: "Bounty",
-      value: "bounty",
+      sortKey: "bounty",
+      sortValue: "desc",
     }
   ]
+  
+  if (tickets.length === 0) return <div>No tickets found.</div>
 
+  
+  
   return (
     <>
       <div className="flex gap-2 w-[520px] ">
-        <SearchInput placeholder="Search tickets..."/>
-        <SortTickets options={options}/>
+        <TicketsSearchInput placeholder="Search tickets..."/>
+        <TicketsSort options={options}/>
       </div>
       <ul className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-8 animate-fade-in ">
         {
@@ -40,9 +55,12 @@ const TicketsList = async ({userId, searchParams}: TicketListProps) => {
           )
         }
       </ul>
-      {
-        tickets.length === 0 && <div>No tickets found.</div>
-      }
+
+      <div className="mt-10 w-full">
+        <TicketPagination count={ticketsData?.metadata.count} hasNext={ticketsData?.metadata.hasNext} />
+      </div>
+
+
     </>
   );
 };

@@ -20,34 +20,69 @@ type getTicketsParams = {
   searchParams: Awaited<ParsedSearchParams>;
 }
 
+
+
 export const getTickets = async ({userId, searchParams}: getTicketsParams) => {
 
-  console.log('sort = ', searchParams.sort)
-
+  const where = {
+    userId,
+    title: {contains: searchParams.search, mode: 'insensitive' as const}
+  }
+  
   try {
-    return await prisma.ticket.findMany({
-        where: {
-          userId,
-          ...(searchParams.search && {
-            OR: [
-              {title: {contains: searchParams.search, mode: 'insensitive'}},
-              {content: {contains: searchParams.search, mode: 'insensitive'}}
-            ]
-          })
-        },
-        orderBy: {
-          ...((searchParams.sort === 'newest') && {deadline: 'asc'}),
-          ...(searchParams.sort === 'bounty' && {bounty: 'asc'})
-        },
-        include: {
-          user: {
-            select: {
-              username: true,
+    // const tickets = await prisma.ticket.findMany({ 
+    //     where,
+    //     skip: searchParams.size * (searchParams.page),
+    //     take: searchParams.size,
+    //     orderBy: {          
+    //       [searchParams.sortKey]: searchParams.sortValue
+    //     },
+    //     include: {
+    //       user: {
+    //         select: {
+    //           username: true,
+    //         }
+    //       }
+    //     }
+    //   }
+    // )
+
+    // const count = await prisma.ticket.count({
+    //   where
+    // });
+    
+    const [tickets, count] = await prisma.$transaction([
+      prisma.ticket.findMany({
+          where,
+          skip: searchParams.size * (searchParams.page),
+          take: searchParams.size,
+          orderBy: {
+            [searchParams.sortKey]: searchParams.sortValue
+          },
+          include: {
+            user: {
+              select: {
+                username: true,
+              }
             }
           }
         }
+      ),
+
+      prisma.ticket.count({
+        where
+      })
+    ])
+    
+
+    return {
+      list: tickets,
+      metadata: {
+        count,
+        hasNext: count > searchParams.size * searchParams.page + searchParams.size,
       }
-    )
+    };
+
   } catch
     (err) {
     console.log(err)
