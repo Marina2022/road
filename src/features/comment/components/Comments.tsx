@@ -1,20 +1,31 @@
-import React from 'react';
+'use client'
+
+import React, {useState} from 'react';
 import OneComment from "@/features/comment/components/OneComment";
-import {getComments} from "@/features/comment/commentActions";
 import CommentCreateForm from "@/features/comment/components/CommentCreateForm";
 import CardCompact from "@/components/shared/Card-compact";
 import DeleteComment from "@/features/comment/components/DeleteComment";
-import {getAuthOrRedirect} from "@/utils/authUtils";
 import {isOwner} from "@/utils/authUtils";
+import {CommentWithMetadata} from "@/features/comment/commetTypes";
+import {User} from "lucia";
+import {Button} from "@/components/ui/button";
+import {getComments} from '../commentActions';
 
 type CommentsProps = {
   ticketId: number;
+  commentsData: { list: CommentWithMetadata[], metadata: { count: number, hasNext: boolean } };
+  user: User;
 }
 
-const Comments = async ({ticketId}: CommentsProps) => {
+const Comments = ({ticketId, commentsData, user}: CommentsProps) => {
+  const [comments, setComments] = useState(commentsData.list);
+  const [hasMore, setHasMore] = useState(commentsData.metadata.hasNext);
 
-  const comments = await getComments(ticketId);
-  const {user} = await getAuthOrRedirect()
+  const handleMore = async () => {
+    const newComments = await getComments(ticketId, comments.length);
+    setComments((prevComments) => [...prevComments, ...newComments.list])
+    setHasMore(newComments.metadata.hasNext)
+  }
 
   return (
     <div>
@@ -37,6 +48,13 @@ const Comments = async ({ticketId}: CommentsProps) => {
           />)
         }
       </div>
+
+      {
+        hasMore && <div className="w-full flex justify-center mb-10">
+          <Button className="flex-1 ml-10" onClick={handleMore} variant="ghost">More</Button>
+        </div>
+      }
+
     </div>
   );
 };

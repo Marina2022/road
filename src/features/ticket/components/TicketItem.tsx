@@ -1,18 +1,16 @@
 import clsx from "clsx";
 import {MoreVertical, Pencil, SquareArrowOutUpRight} from "lucide-react";
 import Link from "next/link";
-import React, {Suspense} from 'react';
+import React from 'react';
 import {Button, buttonVariants} from "@/components/ui/button";
 import {TICKET_ICONS} from "@/features/ticket/constants";
 import {Prisma} from "@prisma/client";
 import {fromCentsToDollars} from "@/utils/currency";
 import TicketMoreMenu from "@/features/ticket/components/TicketMoreMenu";
 import {DropdownMenuTrigger} from "@/components/ui/dropdown-menu";
-import {getAuth} from "@/features/auth/authActions";
-import {isOwner} from "@/utils/authUtils";
+import {getAuthOrRedirect, isOwner} from "@/utils/authUtils";
 import Comments from "@/features/comment/components/Comments";
-import Loader from "@/components/shared/Loader";
-import CommentsSkeleton from "@/features/comment/components/CommentsSkeleton";
+import {CommentWithMetadata} from "@/features/comment/commetTypes";
 
 type TicketItemProps = {
   ticket: Prisma.TicketGetPayload<{
@@ -24,14 +22,22 @@ type TicketItemProps = {
       }
     }
   }>,
-  isDetailed?: boolean
+  isDetailed?: boolean,
+  commentsData: { 
+    list: CommentWithMetadata[],
+    metadata: {
+      count: number,
+      hasNext: boolean
+    }
+  }
 }
 
 
-const TicketItem = async ({ticket, isDetailed = false}: TicketItemProps) => {
+const TicketItem = async ({ticket, isDetailed = false, commentsData}: TicketItemProps) => {
 
-    const {user} = await getAuth()
+    const {user} = await getAuthOrRedirect()
     const isUserOwner = isOwner(user, ticket)
+  
 
     const goBtn = <Button variant="outline" asChild>
       <Link prefetch className="text-sm underline" href={`/tickets/${ticket.id}`}>
@@ -97,10 +103,8 @@ const TicketItem = async ({ticket, isDetailed = false}: TicketItemProps) => {
         </li>
 
         {
-          isDetailed && <div className="max-w-[620px] mx-auto mt-8">
-            <Suspense fallback={<CommentsSkeleton />}>
-              <Comments ticketId={ticket.id}/>
-            </Suspense>
+          isDetailed && <div className="max-w-[620px] mx-auto mt-8">            
+              <Comments ticketId={ticket.id} commentsData={commentsData} user={user} />            
           </div>
         }
 

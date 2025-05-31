@@ -8,7 +8,7 @@ type CommentProps = {
   buttons: ReactNode[]
 }
 
-const OneComment = async({comment, buttons}: CommentProps) => {
+const OneComment = ({comment, buttons}: CommentProps) => {
     
   return (
     <div className="flex gap-4 w-full">

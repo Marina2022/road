@@ -4,6 +4,7 @@ import {getTicket} from "@/features/ticket/ticketActions";
 import {notFound} from "next/navigation";
 import RedirectToaster from "@/components/shared/RedirectToaster";
 import BreadCrumbs from "@/components/shared/BreadCrumbs";
+import {getComments} from "@/features/comment/commentActions";
 
 interface TicketPageProps {
   params: Promise<{
@@ -12,9 +13,11 @@ interface TicketPageProps {
 }
 
 const Page = async ({params}: TicketPageProps) => {
-
   const {ticketId} = await params;
-  const ticket = await getTicket(Number(ticketId))
+  const ticketPromise = getTicket(Number(ticketId))
+  const commentsPromise = getComments(Number(ticketId))
+  
+  const [ticket, commentsData] = await Promise.all([ticketPromise, commentsPromise])
 
   if (!ticket) {
     notFound()
@@ -30,8 +33,8 @@ const Page = async ({params}: TicketPageProps) => {
     <>
       <BreadCrumbs breadcrumbs={breadcrumbs}/>
       <div className="w-4/5 m-auto mt-3">
-        <TicketItem ticket={ticket} isDetailed={true}/>
-      </div>              
+        <TicketItem ticket={ticket} isDetailed={true} commentsData={commentsData}/>
+      </div>
       <RedirectToaster/>
     </>
   )
