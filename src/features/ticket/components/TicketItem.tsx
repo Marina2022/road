@@ -12,6 +12,7 @@ import {getAuth} from "@/features/auth/authActions";
 import {isOwner} from "@/utils/authUtils";
 import Comments from "@/features/comment/components/Comments";
 import Loader from "@/components/shared/Loader";
+import CommentsSkeleton from "@/features/comment/components/CommentsSkeleton";
 
 type TicketItemProps = {
   ticket: Prisma.TicketGetPayload<{
@@ -97,7 +98,7 @@ const TicketItem = async ({ticket, isDetailed = false}: TicketItemProps) => {
 
         {
           isDetailed && <div className="max-w-[620px] mx-auto mt-8">
-            <Suspense fallback={<Loader />}>
+            <Suspense fallback={<CommentsSkeleton />}>
               <Comments ticketId={ticket.id}/>
             </Suspense>
           </div>
