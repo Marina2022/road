@@ -1,17 +1,3 @@
-// 'use client'
-//
-// export default function GlobalError({
-//                                       error,
-//                                     }: {
-//   error: Error
-// }) {
-//   // Можно логировать ошибку для себя, но ничего не показывать
-//   console.error(error)
-//
-//   return <div>hellop</div>
-// }
-
-
 'use client' // Error boundaries must be Client Components
 
 export default function GlobalError({

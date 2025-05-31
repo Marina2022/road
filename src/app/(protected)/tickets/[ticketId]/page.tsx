@@ -1,10 +1,9 @@
 import React from 'react';
 import TicketItem from "@/features/ticket/components/TicketItem";
-import {getTicket, getTickets} from "@/features/ticket/ticketActions";
+import {getTicket} from "@/features/ticket/ticketActions";
 import {notFound} from "next/navigation";
 import RedirectToaster from "@/components/shared/RedirectToaster";
 import BreadCrumbs from "@/components/shared/BreadCrumbs";
-
 
 interface TicketPageProps {
   params: Promise<{
@@ -29,12 +28,10 @@ const Page = async ({params}: TicketPageProps) => {
 
   return (
     <>
-
       <BreadCrumbs breadcrumbs={breadcrumbs}/>
-
       <div className="w-4/5 m-auto mt-3">
-        <TicketItem ticket={ticket} editing={true}/>
-      </div>
+        <TicketItem ticket={ticket} isDetailed={true}/>
+      </div>              
       <RedirectToaster/>
     </>
   )

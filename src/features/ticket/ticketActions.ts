@@ -20,8 +20,6 @@ type getTicketsParams = {
   searchParams: Awaited<ParsedSearchParams>;
 }
 
-
-
 export const getTickets = async ({userId, searchParams}: getTicketsParams) => {
 
   const where = {

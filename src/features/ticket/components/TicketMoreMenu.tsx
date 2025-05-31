@@ -13,7 +13,7 @@ import {
 import {TICKET_LABELS} from "@/features/ticket/constants";
 import {deleteTicket, updateTicketStatus} from "@/features/ticket/ticketActions";
 import {toast} from "sonner";
-import useConfirmDialog from "@/components/shared/useConfirmDialog";
+import useConfirmDialog from "@/hooks/useConfirmDialog";
 import {Button} from "@/components/ui/button";
 import {EMPTY_STATE} from "@/utils/formUtils";
 import TicketStatus = $Enums.TicketStatus;

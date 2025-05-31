@@ -19,7 +19,7 @@ import {usePathname, useRouter} from "next/navigation";
 
 type UseConfirmDialogProps = {
   trigger: React.ReactElement<{ onClick?: () => void }>,
-  action: () => void,
+  action: (formData?: FormData) => void,
   title?: string,
   description?: string,
   actionState: ActionState
@@ -36,10 +36,12 @@ const useConfirmDialog = ({
   const [open, setOpen] = useState(false)
   const router = useRouter();
   const pathname = usePathname();
-
+ 
   const dialogTrigger = cloneElement(trigger,
     {
-      onClick: () => setOpen(true)
+      onClick: () =>{
+        setOpen(true)
+      } 
     })
 
   const handleError = () => {
@@ -61,7 +63,7 @@ const useConfirmDialog = ({
       <AlertDialogFooter>
         <AlertDialogCancel>Cancel</AlertDialogCancel>
         <AlertDialogAction asChild>
-          <Form action={action} actionState={actionState} onError={handleError}>
+          <Form action={action} actionState={actionState} onError={handleError}  >
             <SubmitButton label="Confirm"/>
           </Form>
         </AlertDialogAction>

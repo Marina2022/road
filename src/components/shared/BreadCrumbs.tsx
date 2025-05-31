@@ -16,8 +16,6 @@ type BreadcrumbsProps = {
 }
 
 function BreadCrumbs({breadcrumbs}: BreadcrumbsProps) {
-
-  console.log('breadcrumbs = ', breadcrumbs)
   return (
     <Breadcrumb>
       <BreadcrumbList>

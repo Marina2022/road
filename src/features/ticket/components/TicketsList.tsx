@@ -18,7 +18,6 @@ const TicketsList = async ({userId, searchParams}: TicketListProps) => {
   const ticketsData = await getTickets({userId, searchParams});
   const tickets = ticketsData?.list
   
-  
   const options = [
     {
       label: "Closest deadline",
@@ -37,9 +36,9 @@ const TicketsList = async ({userId, searchParams}: TicketListProps) => {
     }
   ]
 
-  if (!tickets) return null  
-  if (tickets.length === 0) return <div>No tickets found.</div>  
-  
+  if (!tickets) return null
+  if (tickets.length === 0) return <div>No tickets found.</div>
+
   return (
     <>
       <div className="flex gap-2 w-[520px] ">
@@ -52,12 +51,9 @@ const TicketsList = async ({userId, searchParams}: TicketListProps) => {
           )
         }
       </ul>
-
       <div className="mt-10 w-full">
-        <TicketPagination count={ticketsData?.metadata.count} hasNext={ticketsData?.metadata.hasNext} />
+        <TicketPagination count={ticketsData?.metadata.count} hasNext={ticketsData?.metadata.hasNext}/>
       </div>
-
-
     </>
   );
 };

@@ -33,9 +33,9 @@ export default async function RootLayout({
 
   return (
 
-    <html lang="en" suppressHydrationWarning className="h-full">
+    <html lang="en" suppressHydrationWarning className="min-h-full">
     <body
-      className={`${geistSans.variable} ${geistMono.variable} antialiased h-full`}
+      className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-full`}
     >
     <Providers>
 

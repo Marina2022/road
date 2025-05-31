@@ -23,7 +23,7 @@ const Sidebar = () => {
   return (
     <nav
       className={cn(
-        "h-screen border-r pt-24 absolute bg-background ",
+        "min-h-full border-r pt-24 absolute bg-background ",
         // isTransition && "duration-200",
         isOpen ? "md:w-60 w-[78px] duration-200" : "w-[78px] duration-200"
       )}
