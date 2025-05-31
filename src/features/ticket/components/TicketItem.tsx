@@ -23,7 +23,7 @@ type TicketItemProps = {
     }
   }>,
   isDetailed?: boolean,
-  commentsData: { 
+  commentsData?: { 
     list: CommentWithMetadata[],
     metadata: {
       count: number,
@@ -103,7 +103,7 @@ const TicketItem = async ({ticket, isDetailed = false, commentsData}: TicketItem
         </li>
 
         {
-          isDetailed && <div className="max-w-[620px] mx-auto mt-8">            
+          isDetailed && commentsData && <div className="max-w-[620px] mx-auto mt-8">            
               <Comments ticketId={ticket.id} commentsData={commentsData} user={user} />            
           </div>
         }
