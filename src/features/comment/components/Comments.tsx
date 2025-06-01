@@ -10,6 +10,7 @@ import {CommentWithMetadata} from "@/features/comment/commetTypes";
 import {User} from "lucia";
 import {Button} from "@/components/ui/button";
 import {getComments} from '../commentActions';
+import {ActionState} from "@/utils/formUtils";
 
 type CommentsProps = {
   ticketId: number;
@@ -26,13 +27,17 @@ const Comments = ({ticketId, commentsData, user}: CommentsProps) => {
     setComments((prevComments) => [...prevComments, ...newComments.list])
     setHasMore(newComments.metadata.hasNext)
   }
+  
+  const handleAddComment = (actionState: ActionState)=>{
+    setComments(prevComments => [...prevComments, actionState.data as CommentWithMetadata]);
+  }
 
   return (
     <div>
       <CardCompact
         title="Create a new comment"
         description="A new comment will be created"
-        content={<CommentCreateForm ticketId={ticketId}/>}
+        content={<CommentCreateForm ticketId={ticketId} handleAddComment={handleAddComment} />}
       />
 
       <div className="flex flex-col gap-4 mt-10 ml-10 mb-10">
@@ -42,7 +47,7 @@ const Comments = ({ticketId, commentsData, user}: CommentsProps) => {
             comment={comment}
             buttons={[
               ...(isOwner(user, comment)
-                ? [<DeleteComment comment={comment} user={user} key={0}/>]
+                ? [<DeleteComment comment={comment} key={0} setComments={setComments}/>]
                 : [<div key={0} className="w-10"></div>])
             ]}
           />)

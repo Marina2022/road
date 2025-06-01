@@ -45,8 +45,6 @@ export const getComments = async (ticketId: number, offset?: number) => {
       hasNext: count > skip + take,
     }
   }
-
-
 }
 
 export const createComment = async (ticketId: number, actionState: ActionState, formData: FormData): Promise<ActionState> => {
@@ -60,19 +58,24 @@ export const createComment = async (ticketId: number, actionState: ActionState, 
     content: z.string().min(1).max(1024),
   })
 
+  let comment 
+  
   try {
     const contentData = commentSchema.parse({content})
 
-    await prisma.comment.create({
+    comment = await prisma.comment.create({
       data: {
         ...contentData,
         userId: auth.user.id,
         ticketId,
+      },
+      include:{
+        user: true
       }
     })
 
     revalidatePath(`/tickets/${ticketId}`)
-    return toActionState('SUCCESS', 'Created comment')
+    return toActionState('SUCCESS', 'Created comment', comment)
 
   } catch (err) {
     return fromErrorToState(err, formData)

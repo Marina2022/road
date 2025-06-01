@@ -7,8 +7,8 @@ type FormProps = {
   action: (formData: FormData)=>void,
   children: React.ReactNode,
   actionState: ActionState,
-  onSuccess?: () => void,
-  onError?: () => void, 
+  onSuccess?: (actionState: ActionState) => void,
+  onError?: (actionState: ActionState) => void, 
 }
 
 const Form = ({action, actionState, children, onSuccess, onError}:FormProps ) => {
@@ -16,11 +16,11 @@ const Form = ({action, actionState, children, onSuccess, onError}:FormProps ) =>
   const options = useMemo(() => ({
     onSuccess: ({actionState}:{ actionState: ActionState }) => {
       toast.success(actionState.message)
-      onSuccess?.()
+      onSuccess?.(actionState)
     },
     onError: ({actionState}: { actionState: ActionState }) => {
       if (actionState.message) toast.error(actionState.message)
-      onError?.()
+      onError?.(actionState)
     },
   }), [onError, onSuccess])
 

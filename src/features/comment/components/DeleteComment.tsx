@@ -10,29 +10,31 @@ import {Button} from "@/components/ui/button";
 
 type DeleteCommentProps = {
   comment: CommentWithMetadata;
-  user: User;
+  setComments: React.Dispatch<React.SetStateAction<CommentWithMetadata[]>>;
 }
 
-const DeleteComment = ({comment, user}: DeleteCommentProps) => {
+const DeleteComment = ({comment, setComments}: DeleteCommentProps) => {
 
   const [actionState, action] = useActionState(deleteComment.bind(null, comment), EMPTY_STATE)
 
+  const onSuccess = () => {
+    setComments((prev: CommentWithMetadata[]) => prev.filter(prevComment => prevComment.id !== comment.id))
+  }
+
+
   const {dialogTrigger, dialog} = useConfirmDialog({
+    onSuccess,
     action,
     actionState,
     trigger: <Button className="cursor-pointer"><LucideTrash/></Button>
   })
-  
+
   return (
     <>
-      {/*<Form action={action} actionState={actionState}>*/}
-      {/*<SubmitButton icon={<LucideTrash/>}/>*/}
-      {/*</Form>*/}
-
       {dialogTrigger}
       {dialog}
     </>
   )
-};
+}
 
 export default DeleteComment;

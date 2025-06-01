@@ -22,10 +22,12 @@ type UseConfirmDialogProps = {
   action: (formData?: FormData) => void,
   title?: string,
   description?: string,
-  actionState: ActionState
+  actionState: ActionState,
+  onSuccess: (actionState: ActionState)=>void
 }
 
 const useConfirmDialog = ({
+                            onSuccess,
                             action,
                             actionState,
                             trigger,
@@ -36,12 +38,12 @@ const useConfirmDialog = ({
   const [open, setOpen] = useState(false)
   const router = useRouter();
   const pathname = usePathname();
- 
+
   const dialogTrigger = cloneElement(trigger,
     {
-      onClick: () =>{
+      onClick: () => {
         setOpen(true)
-      } 
+      }
     })
 
   const handleError = () => {
@@ -50,6 +52,11 @@ const useConfirmDialog = ({
     } else {
       setOpen(false)
     }
+  }
+
+  const handleSuccess = () => {
+    setOpen(false)
+    onSuccess?.(actionState)
   }
 
   const dialog = <AlertDialog open={open} onOpenChange={setOpen}>
@@ -63,7 +70,7 @@ const useConfirmDialog = ({
       <AlertDialogFooter>
         <AlertDialogCancel>Cancel</AlertDialogCancel>
         <AlertDialogAction asChild>
-          <Form action={action} actionState={actionState} onError={handleError}  >
+          <Form action={action} actionState={actionState} onError={handleError} onSuccess={handleSuccess}>
             <SubmitButton label="Confirm"/>
           </Form>
         </AlertDialogAction>
