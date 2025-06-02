@@ -9,19 +9,62 @@ import {z} from "zod";
 import {CommentWithMetadata} from "@/features/comment/commetTypes";
 import {getAuthOrRedirect, isOwner} from "@/utils/authUtils";
 
-export const getComments = async (ticketId: number, offset?: number) => {
+// export const getComments = async (ticketId: number, offset?: number) => {
+//
+//   const where = {ticketId}
+//
+//   const skip = offset ?? 0
+//   const take = 2
+//
+//   const [comments, count] = await prisma.$transaction([
+//     prisma.comment.findMany(
+//       {
+//         where,
+//         skip,
+//         take,
+//         include: {
+//           user: {
+//             select: {
+//               username: true,
+//             }
+//           }
+//         },
+//         orderBy: {
+//           createdAt: 'desc'
+//         }
+//       }),
+//
+//     prisma.comment.count({where})
+//
+//   ])
+//
+//   return {
+//     list: comments,
+//     metadata: {
+//       count,
+//       hasNext: count > skip + take,
+//     }
+//   }
+// }
 
-  const where = {ticketId}
 
-  const skip = offset ?? 0
+export const getComments = async (ticketId: number, cursor?: number | string) => {
+
+  const where = {
+    ticketId,
+    createdAt: {
+      lt: cursor ? new Date(cursor) : undefined,
+    },
+  }
+
+  // const skip = offset ?? 0
   const take = 2
 
   const [comments, count] = await prisma.$transaction([
     prisma.comment.findMany(
       {
         where,
-        skip,
-        take,
+        take: take + 1,
         include: {
           user: {
             select: {
@@ -38,28 +81,42 @@ export const getComments = async (ticketId: number, offset?: number) => {
 
   ])
 
+  const hasNext =  comments.length > take
+    
+  let cursorToReturn
+  let commentsToReturn
+  
+  if (hasNext) {
+    cursorToReturn = comments.at(-2)?.createdAt.valueOf()
+    commentsToReturn =  comments.slice(0, -1)
+  } else {
+    cursorToReturn = comments.at(-1)?.createdAt.valueOf()
+    commentsToReturn = comments
+  }
+
+
   return {
-    list: comments,
+    list: commentsToReturn,
     metadata: {
       count,
-      hasNext: count > skip + take,
+      hasNext,
+      cursor: cursorToReturn,
     }
   }
 }
+
 
 export const createComment = async (ticketId: number, actionState: ActionState, formData: FormData): Promise<ActionState> => {
 
   const auth = await getAuth()
   if (!auth.user) redirect('/sign-in')
-
   const content = formData.get('content')?.toString()
-
   const commentSchema = z.object({
     content: z.string().min(1).max(1024),
   })
 
-  let comment 
-  
+  let comment
+
   try {
     const contentData = commentSchema.parse({content})
 
@@ -69,7 +126,7 @@ export const createComment = async (ticketId: number, actionState: ActionState, 
         userId: auth.user.id,
         ticketId,
       },
-      include:{
+      include: {
         user: true
       }
     })
@@ -82,7 +139,7 @@ export const createComment = async (ticketId: number, actionState: ActionState, 
   }
 }
 
-// export const deleteComment = async (comment: CommentWithMetadata, actionState: ActionState, formData: FormData): Promise<ActionState> => {
+
 export const deleteComment = async (comment: CommentWithMetadata): Promise<ActionState> => {
   console.log('пришел')
   const auth = await getAuthOrRedirect()

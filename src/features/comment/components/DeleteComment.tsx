@@ -9,15 +9,16 @@ import {Button} from "@/components/ui/button";
 
 type DeleteCommentProps = {
   comment: CommentWithMetadata;
-  setComments: React.Dispatch<React.SetStateAction<CommentWithMetadata[]>>;
+  handleDelete: () => void;
 }
 
-const DeleteComment = ({comment, setComments}: DeleteCommentProps) => {
+const DeleteComment = ({comment, handleDelete}: DeleteCommentProps) => {
 
   const [actionState, action, isPending] = useActionState(deleteComment.bind(null, comment), EMPTY_STATE)
 
   const onSuccess = () => {
-    setComments((prev: CommentWithMetadata[]) => prev.filter(prevComment => prevComment.id !== comment.id))
+    // handleDelete(comment)
+    handleDelete()
   }
 
   const {dialogTrigger, dialog} = useConfirmDialog({
@@ -30,12 +31,6 @@ const DeleteComment = ({comment, setComments}: DeleteCommentProps) => {
         <LucideTrash/>
       }
     </Button>
-
-    // trigger: (isPending: boolean) => <Button className="cursor-pointer">
-    //   {
-    //     isPending ? <Loader/> : <LucideTrash/>
-    //   }
-    // </Button>
   })
 
   return (

@@ -1,6 +1,6 @@
 'use client'
 
-import React, {useState} from 'react';
+import React, {useEffect} from 'react';
 import OneComment from "@/features/comment/components/OneComment";
 import CommentCreateForm from "@/features/comment/components/CommentCreateForm";
 import CardCompact from "@/components/shared/Card-compact";
@@ -10,34 +10,67 @@ import {CommentWithMetadata} from "@/features/comment/commetTypes";
 import {User} from "lucia";
 import {Button} from "@/components/ui/button";
 import {getComments} from '../commentActions';
-import {ActionState} from "@/utils/formUtils";
+import {PaginatedData} from "@/types/pagination";
+import {useInfiniteQuery, useQueryClient} from "@tanstack/react-query";
+import {useInView} from "react-intersection-observer";
 
 type CommentsProps = {
   ticketId: number;
-  commentsData: { list: CommentWithMetadata[], metadata: { count: number, hasNext: boolean } };
+  commentsData: PaginatedData<CommentWithMetadata>;
   user: User;
 }
 
 const Comments = ({ticketId, commentsData, user}: CommentsProps) => {
-  const [comments, setComments] = useState(commentsData.list);
-  const [hasMore, setHasMore] = useState(commentsData.metadata.hasNext);
+  
+  const {data, fetchNextPage, hasNextPage, isFetchingNextPage} = useInfiniteQuery({
+    queryKey: ['comments', ticketId],
+    queryFn: ({pageParam}) => getComments(ticketId, pageParam),
+    initialPageParam: undefined as number | undefined,
+    getNextPageParam: (lastPage) => {
+      return lastPage.metadata.hasNext ? lastPage.metadata.cursor : undefined
+    },
+    initialData: {
+      pages: [{
+        list: commentsData.list,
+        metadata: commentsData.metadata
+      }],
+      pageParams: [undefined]
+    }
+  })
+  
+   
+  const queryClient = useQueryClient();
 
   const handleMore = async () => {
-    const newComments = await getComments(ticketId, comments.length);
-    setComments((prevComments) => [...prevComments, ...newComments.list])
-    setHasMore(newComments.metadata.hasNext)
+    await fetchNextPage();
   }
+
+  const handleAddComment = () => {
+    queryClient.invalidateQueries({queryKey: ['comments', ticketId]})
+  }
+
+  const handleDelete = () => {
+    queryClient.invalidateQueries({queryKey: ['comments', ticketId]})
+  }
+
+  const comments = data.pages.map(page => page.list).flat()  
   
-  const handleAddComment = (actionState: ActionState)=>{
-    setComments(prevComments => [...prevComments, actionState.data as CommentWithMetadata]);
-  }
+  const {ref, inView} = useInView()
+
+  console.log('inView = ', inView)
+  
+  useEffect(() => {
+    if (inView && !isFetchingNextPage && hasNextPage) {
+      handleMore()
+    }
+  }, [inView])
 
   return (
     <div>
       <CardCompact
         title="Create a new comment"
         description="A new comment will be created"
-        content={<CommentCreateForm ticketId={ticketId} handleAddComment={handleAddComment} />}
+        content={<CommentCreateForm ticketId={ticketId} handleAddComment={handleAddComment}/>}
       />
 
       <div className="flex flex-col gap-4 mt-10 ml-10 mb-10">
@@ -47,7 +80,7 @@ const Comments = ({ticketId, commentsData, user}: CommentsProps) => {
             comment={comment}
             buttons={[
               ...(isOwner(user, comment)
-                ? [<DeleteComment comment={comment} key={0} setComments={setComments}/>]
+                ? [<DeleteComment comment={comment} key={0} handleDelete={handleDelete}/>]
                 : [<div key={0} className="w-10"></div>])
             ]}
           />)
@@ -55,11 +88,14 @@ const Comments = ({ticketId, commentsData, user}: CommentsProps) => {
       </div>
 
       {
-        hasMore && <div className="w-full flex justify-center mb-10">
-          <Button className="flex-1 ml-10" onClick={handleMore} variant="ghost">More</Button>
+        // metadata.hasNext && <div className="w-full flex justify-center mb-10">
+        hasNextPage && <div className="w-full flex justify-center mb-10">
+          <Button className="flex-1 ml-10" onClick={handleMore} variant="ghost"
+                  disabled={isFetchingNextPage}>More</Button>
         </div>
       }
-
+      
+      <div ref={ref}></div>
     </div>
   );
 };
