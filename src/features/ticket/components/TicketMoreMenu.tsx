@@ -5,7 +5,7 @@ import {X} from "lucide-react";
 import {$Enums, Ticket} from "@prisma/client";
 import {
   DropdownMenu,
-  DropdownMenuContent,
+  DropdownMenuContent, DropdownMenuItem,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuSeparator
@@ -35,14 +35,14 @@ const TicketMoreMenu = ({ticket, trigger}: { ticket: Ticket, trigger: React.Reac
     }
   }
 
-  const [actionState, action] = useActionState(deleteTicket.bind(null, Number(ticket.id)), EMPTY_STATE)
-  
+  const [actionState, action, isPending] = useActionState(deleteTicket.bind(null, Number(ticket.id)), EMPTY_STATE)
+
   const {dialogTrigger, dialog} = useConfirmDialog({
-    
+      isPending,
       trigger: <div className="cursor-pointer">
         <Button variant="outline"> <X/> </Button>
         <span className="ml-4">Delete</span>
-      </div>,    
+      </div>,
       action,
       actionState
     }
@@ -67,7 +67,9 @@ const TicketMoreMenu = ({ticket, trigger}: { ticket: Ticket, trigger: React.Reac
             }
           </DropdownMenuRadioGroup>
           <DropdownMenuSeparator/>
-          {dialogTrigger}
+          <DropdownMenuItem>
+            {dialogTrigger}
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
       {dialog}
