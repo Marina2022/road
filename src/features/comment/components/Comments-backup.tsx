@@ -33,12 +33,14 @@ const Comments = ({ticketId, commentsData, user}: CommentsProps) => {
     setComments(prevComments => [...prevComments, actionState.data as CommentWithMetadata]);
   }
 
-  // этот варик правильный, поменяла, чтобы тайпскрипт на верселе не ругался
+  // тут правильный вариант, заменила на второй, т.к. ругается тайпскрипт на Верселе
   // const handleDelete = (comment: CommentWithMetadata)=>{
-  const handleDelete = ()=>{
-    setComments((prev: CommentWithMetadata[]) => prev.filter(prevComment => prevComment.id !== comment.id))
-  }
+  //   setComments((prev: CommentWithMetadata[]) => prev.filter(prevComment => prevComment.id !== comment.id))
+  // }
 
+  const handleDelete = ()=>{
+    // setComments((prev: CommentWithMetadata[]) => prev.filter(prevComment => prevComment.id !== comment.id))
+  }
   return (
     <div>
       <CardCompact
@@ -54,6 +56,7 @@ const Comments = ({ticketId, commentsData, user}: CommentsProps) => {
             comment={comment}
             buttons={[
               ...(isOwner(user, comment)
+                // ? [<DeleteComment comment={comment} key={0} handleDelete={handleDelete} />]
                 ? [<DeleteComment comment={comment} key={0} handleDelete={handleDelete} />]
                 : [<div key={0} className="w-10"></div>])
             ]}
