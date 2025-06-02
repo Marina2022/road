@@ -33,7 +33,9 @@ const Comments = ({ticketId, commentsData, user}: CommentsProps) => {
     setComments(prevComments => [...prevComments, actionState.data as CommentWithMetadata]);
   }
 
-  const handleDelete = (comment: CommentWithMetadata)=>{
+  // этот варик правильный, поменяла, чтобы тайпскрипт на верселе не ругался
+  // const handleDelete = (comment: CommentWithMetadata)=>{
+  const handleDelete = ()=>{
     setComments((prev: CommentWithMetadata[]) => prev.filter(prevComment => prevComment.id !== comment.id))
   }
 
