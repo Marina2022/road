@@ -66,8 +66,6 @@ const useConfirmDialog = ({
   )
 
   const toastId = useRef<number | string | null>(null);
-
-  console.log('isPending', isPending)
   
   useEffect(() => {
     if (isPending) {

@@ -22,3 +22,13 @@ export const isOwner = (user: User | null | undefined, entity: Entity | null | u
 
   return entity.userId === user.id
 }
+
+
+export const generatePasswordResetLink = async (userId: string) => {
+  
+  // userId в виде хэша + ссылка на нужную страницу
+  
+  // const passwordResetLink = baseUrl + "/resetPassword?token=" + token
+  
+  
+}

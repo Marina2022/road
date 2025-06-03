@@ -13,6 +13,7 @@ import {getComments} from '../commentActions';
 import {PaginatedData} from "@/types/pagination";
 import {useInfiniteQuery, useQueryClient} from "@tanstack/react-query";
 import {useInView} from "react-intersection-observer";
+import {getBaseUrl} from "@/utils/testEnv";
 
 type CommentsProps = {
   ticketId: number;
@@ -37,6 +38,9 @@ const Comments = ({ticketId, commentsData, user}: CommentsProps) => {
       pageParams: [undefined]
     }
   })
+
+
+  console.log("getBaseUrl = ", getBaseUrl())
   
    
   const queryClient = useQueryClient();
@@ -56,9 +60,7 @@ const Comments = ({ticketId, commentsData, user}: CommentsProps) => {
   const comments = data.pages.map(page => page.list).flat()  
   
   const {ref, inView} = useInView()
-
-  console.log('inView = ', inView)
-  
+    
   useEffect(() => {
     if (inView && !isFetchingNextPage && hasNextPage) {
       handleMore()

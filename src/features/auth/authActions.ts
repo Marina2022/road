@@ -8,6 +8,7 @@ import {lucia} from "@/lib/lucia";
 import {redirect} from "next/navigation";
 import {cookies} from "next/headers";
 import {cache} from "react";
+import {generatePasswordResetLink} from "@/utils/authUtils";
 
 export const signUp = async (_state: ActionState, formData: FormData): Promise<ActionState> => {
 
@@ -149,4 +150,36 @@ export const signOut = async () => {
     sessionCookie.attributes
   )
   redirect('/sign-in')
+}
+
+
+
+
+export const passwordForgot = async (_state: ActionState, formData: FormData): Promise<ActionState> => {
+
+  const signInSchema = z.object({
+    email: z.string().min(1, {message: "Email is required"}).email(),
+  })
+  
+  try {
+    const {email} = signInSchema.parse(
+      Object.fromEntries(formData)
+    )
+
+    const user = await prisma.user.findUnique({
+      where: {email}
+    })
+    
+    if (!user) return fromErrorToState(new Error("Incorrect email"), formData)
+    
+    const passwordResetLink = await generatePasswordResetLink(user.id)
+
+    console.log(passwordResetLink)
+    
+    
+    return toActionState('SUCCESS', "Check your email for a reset link")
+  } catch (error) {
+    return fromErrorToState(error, formData)
+  }
+  
 }
