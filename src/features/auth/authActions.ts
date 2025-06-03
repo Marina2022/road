@@ -8,7 +8,10 @@ import {lucia} from "@/lib/lucia";
 import {redirect} from "next/navigation";
 import {cookies} from "next/headers";
 import {cache} from "react";
-import {generatePasswordResetLink} from "@/utils/authUtils";
+import {generatePasswordResetLink, getAuthOrRedirect} from "@/utils/authUtils";
+import {hashToken} from "@/utils/crypto";
+import {setCookie} from "@/actions/cookies";
+import {hashPassword, verifyPasswordHash} from "@/utils/passwordUtils";
 
 export const signUp = async (_state: ActionState, formData: FormData): Promise<ActionState> => {
 
@@ -152,15 +155,120 @@ export const signOut = async () => {
   redirect('/sign-in')
 }
 
+export const passwordReset = async (tokenId: string, _state: ActionState, formData: FormData): Promise<ActionState> => {
+
+  const resetPasswordSchema = z.object({
+    password: z.string().min(3).max(191),
+    confirmPassword: z.string().min(3).max(191),
+  })
+    .superRefine(({password, confirmPassword}, ctx) => {
+      if (password !== confirmPassword) {
+        ctx.addIssue({
+          code: 'custom',
+          message: 'Passwords do not match',
+          path: ['confirmPassword']
+        })
+      }
+    })
+
+  try {
+    const {password} = resetPasswordSchema.parse(
+      Object.fromEntries(formData)
+    )
+
+    const resetPasswordRecord = await prisma.passwordResetToken.findUnique({
+      where: {
+        tokenHash: hashToken(tokenId)
+      }
+    })
+
+    if (!resetPasswordRecord || resetPasswordRecord.expiresAt.getTime() < Date.now()) {
+      return fromErrorToState(new Error("Invalid or expired token"), formData)
+    }
+
+    await prisma.session.deleteMany({
+      where: {
+        userId: resetPasswordRecord.userId
+      }
+    })
+
+    await prisma.passwordResetToken.deleteMany({
+      where: {userId: resetPasswordRecord.userId}
+    })
+
+    await prisma.user.update({
+      data: {
+        passwordHash: await hashPassword(password),
+        //passwordHash: await hash(password),        
+      },
+      where: {id: resetPasswordRecord.userId}
+    })
+
+    await setCookie({key: 'toast', value: 'Password reset successfully'})
 
 
+  } catch (error) {
+    return fromErrorToState(error, formData)
+  }
+
+  redirect('/sign-in')
+}
+
+
+export const passwordChange = async (_state: ActionState, formData: FormData): Promise<ActionState> => {
+
+  const passwordChangeSchema = z.object({
+    password: z.string().min(1, {message: "Password is required"}),
+  })
+
+  try {
+    const {password} = passwordChangeSchema.parse(
+      Object.fromEntries(formData)
+    )
+
+    const {user} = await getAuthOrRedirect()
+    
+    const userFromDB = await prisma.user.findUnique({where: {id: user.id}})
+
+    
+    if (!userFromDB) return toActionState('ERROR', "Юзера нет в БД")
+    
+    if (await verifyPasswordHash(userFromDB.passwordHash, password)  ) {
+      return toActionState('ERROR', "Password is incorrect", formData)
+    } 
+    
+    const {passwordResetLink, tokenId} = await generatePasswordResetLink(user.id)
+
+
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    await prisma.passwordResetToken.deleteMany({
+      where: {userId: user.id}
+    })
+
+    await prisma.passwordResetToken.create({
+      data: {
+        tokenHash: hashToken(tokenId),
+        expiresAt: tomorrow,
+        userId: user.id
+      }
+    })
+
+    console.log(passwordResetLink)
+
+    return toActionState('SUCCESS', "Check your email for a reset link")
+  } catch (error) {
+    return fromErrorToState(error, formData)
+  }
+}
 
 export const passwordForgot = async (_state: ActionState, formData: FormData): Promise<ActionState> => {
 
   const signInSchema = z.object({
     email: z.string().min(1, {message: "Email is required"}).email(),
   })
-  
+
   try {
     const {email} = signInSchema.parse(
       Object.fromEntries(formData)
@@ -169,17 +277,31 @@ export const passwordForgot = async (_state: ActionState, formData: FormData): P
     const user = await prisma.user.findUnique({
       where: {email}
     })
-    
+
     if (!user) return fromErrorToState(new Error("Incorrect email"), formData)
-    
-    const passwordResetLink = await generatePasswordResetLink(user.id)
+
+    const {passwordResetLink, tokenId} = await generatePasswordResetLink(user.id)
+
+
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    await prisma.passwordResetToken.deleteMany({
+      where: {userId: user.id}
+    })
+
+    await prisma.passwordResetToken.create({
+      data: {
+        tokenHash: hashToken(tokenId),
+        expiresAt: tomorrow,
+        userId: user.id
+      }
+    })
 
     console.log(passwordResetLink)
-    
-    
+
     return toActionState('SUCCESS', "Check your email for a reset link")
   } catch (error) {
     return fromErrorToState(error, formData)
   }
-  
 }

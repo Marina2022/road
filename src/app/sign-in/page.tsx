@@ -3,6 +3,7 @@ import SignInForm from "@/features/auth/components/SignInForm";
 
 import CardCompact from "@/components/shared/Card-compact";
 import Link from "next/link";
+import RedirectToaster from "@/components/shared/RedirectToaster";
 
 const Page = () => {
   return (
@@ -16,6 +17,7 @@ const Page = () => {
                      <Link href="/forgot-password">Forgot Password?</Link>                     
                    </div>}
       />
+      <RedirectToaster/>
     </div>
   );
 };

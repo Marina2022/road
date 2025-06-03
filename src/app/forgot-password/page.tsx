@@ -1,7 +1,7 @@
 import React from 'react';
 
 import CardCompact from "@/components/shared/Card-compact";
-import ForgotPasswordForm from "@/features/auth/components/ForgotPaswordForm";
+import PasswordChangeForm from "@/features/auth/components/PasswordChangeForm";
 
 const Page = () => {
   return (
@@ -9,7 +9,7 @@ const Page = () => {
       <CardCompact className="max-w-[520px] flex-1 mx-auto mb-10 animate-fade-in"
                    title="Forgot Password"
                    description="Enter your email address to reset your password"
-                   content={<ForgotPasswordForm />}                   
+                   content={<PasswordChangeForm />}                   
       />
     </div>
   );

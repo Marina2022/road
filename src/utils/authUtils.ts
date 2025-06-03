@@ -1,6 +1,9 @@
 import {getAuth} from "@/features/auth/authActions";
 import {User} from "lucia";
 import {redirect} from "next/navigation";
+import {getBaseUrl} from "@/utils/testEnv";
+import {generateRandomToken} from "@/utils/crypto";
+
 
 export const getAuthOrRedirect = async () => {
   const auth = await getAuth()
@@ -25,10 +28,14 @@ export const isOwner = (user: User | null | undefined, entity: Entity | null | u
 
 
 export const generatePasswordResetLink = async (userId: string) => {
+      
+  // const passwordResetLink = baseUrl + "/password-reset?token=" + token
   
-  // userId в виде хэша + ссылка на нужную страницу
-  
-  // const passwordResetLink = baseUrl + "/resetPassword?token=" + token
-  
-  
+  const baseUrl = getBaseUrl()  
+  const tokenId = generateRandomToken()  
+  const passwordResetLink = baseUrl + "/password-reset/" + tokenId
+
+  return {passwordResetLink, tokenId}  
 }
+
+
