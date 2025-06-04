@@ -9,9 +9,11 @@ import {redirect} from "next/navigation";
 import {cookies} from "next/headers";
 import {cache} from "react";
 import {generatePasswordResetLink, getAuthOrRedirect} from "@/utils/authUtils";
-import {hashToken} from "@/utils/crypto";
+import {generateRandomToken, hashToken} from "@/utils/crypto";
 import {setCookie} from "@/actions/cookies";
 import {hashPassword, verifyPasswordHash} from "@/utils/passwordUtils";
+import sendEmailPasswordReset from "@/features/auth/send-email-password-reset";
+import {inngest} from "@/lib/inngest";
 
 export const signUp = async (_state: ActionState, formData: FormData): Promise<ActionState> => {
 
@@ -215,6 +217,8 @@ export const passwordReset = async (tokenId: string, _state: ActionState, formDa
 }
 
 
+
+
 export const passwordChange = async (_state: ActionState, formData: FormData): Promise<ActionState> => {
 
   const passwordChangeSchema = z.object({
@@ -228,17 +232,16 @@ export const passwordChange = async (_state: ActionState, formData: FormData): P
 
     const {user} = await getAuthOrRedirect()
     
-    const userFromDB = await prisma.user.findUnique({where: {id: user.id}})
-
-    
+    const userFromDB = await prisma.user.findUnique({where: {id: user.id}})    
     if (!userFromDB) return toActionState('ERROR', "Юзера нет в БД")
     
     if (await verifyPasswordHash(userFromDB.passwordHash, password)  ) {
       return toActionState('ERROR', "Password is incorrect", formData)
     } 
     
-    const {passwordResetLink, tokenId} = await generatePasswordResetLink(user.id)
+    // const {passwordResetLink, tokenId} = await generatePasswordResetLink(user.id)
 
+    const tokenId = generateRandomToken()
 
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
@@ -255,13 +258,23 @@ export const passwordChange = async (_state: ActionState, formData: FormData): P
       }
     })
 
-    console.log(passwordResetLink)
+    // console.log(passwordResetLink)
 
+    await inngest.send({
+      name: "app/password.password-reset",
+      data: {userId: user.id, tokenId: tokenId}
+    })
+    
+    // await sendEmailPasswordReset({name: user.username, email: 'marusiiiia@yandex.ru', url: passwordResetLink})
+
+    
     return toActionState('SUCCESS', "Check your email for a reset link")
   } catch (error) {
     return fromErrorToState(error, formData)
   }
 }
+
+//*************************
 
 export const passwordForgot = async (_state: ActionState, formData: FormData): Promise<ActionState> => {
 
@@ -280,7 +293,7 @@ export const passwordForgot = async (_state: ActionState, formData: FormData): P
 
     if (!user) return fromErrorToState(new Error("Incorrect email"), formData)
 
-    const {passwordResetLink, tokenId} = await generatePasswordResetLink(user.id)
+    // const {passwordResetLink, tokenId} = await generatePasswordResetLink(user.id)
 
 
     const tomorrow = new Date();
@@ -290,6 +303,8 @@ export const passwordForgot = async (_state: ActionState, formData: FormData): P
       where: {userId: user.id}
     })
 
+    const tokenId = generateRandomToken()
+
     await prisma.passwordResetToken.create({
       data: {
         tokenHash: hashToken(tokenId),
@@ -298,9 +313,16 @@ export const passwordForgot = async (_state: ActionState, formData: FormData): P
       }
     })
 
-    console.log(passwordResetLink)
+
+    await inngest.send({
+      name: "app/password.password-reset",
+      data: {userId: user.id, tokenId}
+    })
+
 
     return toActionState('SUCCESS', "Check your email for a reset link")
+       
+    
   } catch (error) {
     return fromErrorToState(error, formData)
   }

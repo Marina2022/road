@@ -13,6 +13,9 @@ type PageProps = {
 const Page = async ({params}: PageProps) => {
   
   const {tokenId}  = await params
+
+  console.log('tokenId = ', tokenId)
+  console.log('hashToken(tokenId) = ', hashToken(tokenId))
   
   const resetTokenHashRecord = await prisma.passwordResetToken.findUnique({where: {
       tokenHash: hashToken(tokenId)}
