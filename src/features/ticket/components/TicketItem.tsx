@@ -8,9 +8,10 @@ import {Prisma} from "@prisma/client";
 import {fromCentsToDollars} from "@/utils/currency";
 import TicketMoreMenu from "@/features/ticket/components/TicketMoreMenu";
 import {DropdownMenuTrigger} from "@/components/ui/dropdown-menu";
-import {getAuthOrRedirect, isOwner} from "@/utils/authUtils";
+import {isOwner} from "@/utils/authUtils";
 import Comments from "@/features/comment/components/Comments";
 import {CommentWithMetadata} from "@/features/comment/commetTypes";
+import {getAuth} from "@/features/auth/authActions";
 
 type TicketItemProps = {
   ticket: Prisma.TicketGetPayload<{
@@ -35,9 +36,8 @@ type TicketItemProps = {
 
 const TicketItem = async ({ticket, isDetailed = false, commentsData}: TicketItemProps) => {
 
-    const {user} = await getAuthOrRedirect()
-    const isUserOwner = isOwner(user, ticket)
-  
+    const {user} = await getAuth()     
+    const isUserOwner = isOwner(user, ticket)  
 
     const goBtn = <Button variant="outline" asChild>
       <Link prefetch className="text-sm underline" href={`/tickets/${ticket.id}`}>

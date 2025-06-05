@@ -1,5 +1,5 @@
 import {NavItem} from "@/components/layout/sidebar/sidebar-types";
-import {Book, CircleUser, Library} from "lucide-react";
+import {Book, CircleUser, Library, Users} from "lucide-react";
 
 export const navItems: NavItem[] = [
   {
@@ -17,5 +17,11 @@ export const navItems: NavItem[] = [
     title: "Account",
     icon: <CircleUser/>,
     href: '/account/profile'
+  },
+  {
+    separator: true,
+    title: "Organizations",
+    icon: <Users />,
+    href: '/organization'
   }
 ]

@@ -16,18 +16,53 @@ datasource db {
 }
 
 model User {
-  id                  String               @id @default(cuid())
-  username            String               @unique
-  email               String               @unique
-  passwordHash        String
-  sessions            Session[]
-  tickets             Ticket[]
-  comments            Comment[]
-  PasswordResetTokens PasswordResetToken[]
+  id                     String                   @id @default(cuid())
+  username               String                   @unique
+  email                  String                   @unique
+  passwordHash           String
+  sessions               Session[]
+  emailVerified          Boolean                  @default(false)
+  tickets                Ticket[]
+  comments               Comment[]
+  PasswordResetTokens    PasswordResetToken[]
+  emailVerificationToken EmailVerificationToken[]
+  memberships            Membership[]
+}
+
+model Membership {
+  userId         String
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  joinedAt       DateTime     @default(now())
+  isActive       Boolean
+
+  @@id([organizationId, userId])
+  @@index([userId])
+  @@index([organizationId])
+}
+
+model Organization {
+  id          String       @id @default(cuid())
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  name        String
+  memberships Membership[]
 }
 
 model PasswordResetToken {
   tokenHash String   @id
+  expiresAt DateTime
+  userId    String
+  User      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model EmailVerificationToken {
+  id        String   @id @default(cuid())
+  code      String
+  email     String
   expiresAt DateTime
   userId    String
   User      User     @relation(fields: [userId], references: [id], onDelete: Cascade)

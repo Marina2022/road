@@ -18,7 +18,7 @@ import {getBaseUrl} from "@/utils/testEnv";
 type CommentsProps = {
   ticketId: number;
   commentsData: PaginatedData<CommentWithMetadata>;
-  user: User;
+  user: User | null;
 }
 
 const Comments = ({ticketId, commentsData, user}: CommentsProps) => {

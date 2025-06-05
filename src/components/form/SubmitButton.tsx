@@ -6,7 +6,7 @@ import {useFormStatus} from "react-dom";
 import {LoaderCircle} from "lucide-react";
 
 const SubmitButton = ({label, className = '', variant = "default", icon}: {
-  label?: string,
+  label?: React.ReactNode,
   className?: string,
   icon?: React.ReactElement,
   variant?: "default" | "link" | "destructive" | "outline" | "secondary" | "ghost" | null | undefined

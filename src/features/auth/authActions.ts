@@ -8,11 +8,10 @@ import {lucia} from "@/lib/lucia";
 import {redirect} from "next/navigation";
 import {cookies} from "next/headers";
 import {cache} from "react";
-import {generatePasswordResetLink, getAuthOrRedirect} from "@/utils/authUtils";
+import {generateEmailVerificationToken, getAuthOrRedirect} from "@/utils/authUtils";
 import {generateRandomToken, hashToken} from "@/utils/crypto";
 import {setCookie} from "@/actions/cookies";
 import {hashPassword, verifyPasswordHash} from "@/utils/passwordUtils";
-import sendEmailPasswordReset from "@/features/auth/send-email-password-reset";
 import {inngest} from "@/lib/inngest";
 
 export const signUp = async (_state: ActionState, formData: FormData): Promise<ActionState> => {
@@ -46,6 +45,13 @@ export const signUp = async (_state: ActionState, formData: FormData): Promise<A
         email,
         passwordHash,
       }
+    })
+
+    const emailVerificationToken = await generateEmailVerificationToken(user.id, email)
+
+    await inngest.send({
+      name: "app/email.verification",
+      data: {userId: user.id, tokenId: emailVerificationToken}
     })
 
     const session = await lucia.createSession(user.id, {})
@@ -93,7 +99,6 @@ export const signIn = async (_state: ActionState, formData: FormData): Promise<A
       sessionCookie.value,
       sessionCookie.attributes
     )
-//    return toActionState('SUCCESS', 'Signed in')
 
   } catch (error) {
     return fromErrorToState(error, formData)
@@ -212,12 +217,8 @@ export const passwordReset = async (tokenId: string, _state: ActionState, formDa
   } catch (error) {
     return fromErrorToState(error, formData)
   }
-
   redirect('/sign-in')
 }
-
-
-
 
 export const passwordChange = async (_state: ActionState, formData: FormData): Promise<ActionState> => {
 
@@ -231,14 +232,14 @@ export const passwordChange = async (_state: ActionState, formData: FormData): P
     )
 
     const {user} = await getAuthOrRedirect()
-    
-    const userFromDB = await prisma.user.findUnique({where: {id: user.id}})    
+
+    const userFromDB = await prisma.user.findUnique({where: {id: user.id}})
     if (!userFromDB) return toActionState('ERROR', "Юзера нет в БД")
-    
-    if (await verifyPasswordHash(userFromDB.passwordHash, password)  ) {
+
+    if (await verifyPasswordHash(userFromDB.passwordHash, password)) {
       return toActionState('ERROR', "Password is incorrect", formData)
-    } 
-    
+    }
+
     // const {passwordResetLink, tokenId} = await generatePasswordResetLink(user.id)
 
     const tokenId = generateRandomToken()
@@ -264,10 +265,10 @@ export const passwordChange = async (_state: ActionState, formData: FormData): P
       name: "app/password.password-reset",
       data: {userId: user.id, tokenId: tokenId}
     })
-    
+
     // await sendEmailPasswordReset({name: user.username, email: 'marusiiiia@yandex.ru', url: passwordResetLink})
 
-    
+
     return toActionState('SUCCESS', "Check your email for a reset link")
   } catch (error) {
     return fromErrorToState(error, formData)
@@ -318,12 +319,108 @@ export const passwordForgot = async (_state: ActionState, formData: FormData): P
       name: "app/password.password-reset",
       data: {userId: user.id, tokenId}
     })
-
-
     return toActionState('SUCCESS', "Check your email for a reset link")
-       
-    
+
   } catch (error) {
     return fromErrorToState(error, formData)
   }
 }
+
+
+export const emailVerification = async (_state: ActionState, formData: FormData): Promise<ActionState> => {
+
+  const emailVerificationSchema = z.object({
+    code: z.string().length(6),
+  })
+
+  const {code} = emailVerificationSchema.parse(Object.fromEntries(formData))
+  const {user} = await getAuth()
+
+  if (!user) redirect('/sign-in')
+
+  try {
+
+    const emailVerificationToken = await prisma.emailVerificationToken.findFirst({
+      where: {
+        userId: user.id
+      }
+    })
+
+    if (!emailVerificationToken || emailVerificationToken.code !== code) return fromErrorToState(new Error("не совпадают же"), formData)
+    // еще можно сравнить email текущего юзера из auth с email внутри токена, а то вдруг перебором решил код подобрать
+
+    await prisma.user.update({
+      where: {id: user.id},
+      data: {
+        emailVerified: true
+      }
+    })
+
+    await prisma.emailVerificationToken.deleteMany({
+      where: {id: emailVerificationToken.id}
+    })
+
+    await prisma.session.deleteMany({
+      where: {userId: user.id}
+    })
+
+    const session = await lucia.createSession(user.id, {})
+    const sessionCookie = lucia.createSessionCookie(session.id)
+
+    const cookiesStore = await cookies()
+    cookiesStore.set(
+      sessionCookie.name,
+      sessionCookie.value,
+      sessionCookie.attributes
+    )
+
+
+  } catch (error) {
+    return fromErrorToState(error, formData)
+  }
+
+  setCookie({key: 'toast', value: 'email verified'})
+  redirect('/tickets')
+}
+
+
+export const emailVerificationResend = async (_state: ActionState): Promise<ActionState> => {
+
+  const {user} = await getAuth()
+
+  if (!user) redirect('/sign-in')
+
+  try {
+
+    await prisma.session.deleteMany({
+      where: {userId: user.id}
+    })
+
+
+    const emailVerificationToken = await generateEmailVerificationToken(user.id, user.email)
+
+    await inngest.send({
+      name: "app/email.verification",
+      data: {userId: user.id, tokenId: emailVerificationToken}
+    })
+
+
+    const session = await lucia.createSession(user.id, {})
+    const sessionCookie = lucia.createSessionCookie(session.id)
+
+    const cookiesStore = await cookies()
+    cookiesStore.set(
+      sessionCookie.name,
+      sessionCookie.value,
+      sessionCookie.attributes
+    )
+
+
+  } catch (error) {
+    return toActionState('ERROR', 'too bad' )
+  }
+
+  setCookie({key: 'toast', value: 'email verified'})
+  redirect('/tickets')
+}
+
