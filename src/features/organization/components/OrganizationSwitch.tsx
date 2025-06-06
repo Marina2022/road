@@ -15,7 +15,9 @@ const OrganizationSwitch = ({organizationId, trigger}:OrganizationSwitchProps, )
   const [actionState, action] = useActionState(switchOrganization.bind(null, organizationId), EMPTY_STATE)  
   return (
     <Form actionState={actionState} action={action} >
-      {trigger}      
+      <div className="w-[92px]">
+      {trigger}
+      </div>  
     </Form>
   );
 };

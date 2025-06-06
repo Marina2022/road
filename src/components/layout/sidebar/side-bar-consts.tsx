@@ -22,6 +22,6 @@ export const navItems: NavItem[] = [
     separator: true,
     title: "Organizations",
     icon: <Users />,
-    href: '/organization'
+    href: '/organizations'
   }
 ]

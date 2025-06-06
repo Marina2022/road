@@ -6,7 +6,6 @@ import Providers from "@/providers";
 import React from "react";
 import Sidebar from "@/components/layout/sidebar/components/sidebar";
 import {getAuth} from "@/features/auth/authActions";
-import RedirectToaster from "@/components/shared/RedirectToaster";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

@@ -30,19 +30,22 @@ export const getAuthOrRedirect = async (options?: Options) => {
   if (!userFromDB.emailVerified) {
     redirect('/email-verification')
   }
+  
 
   const organizations = await getOrganizationsByUser()
   if (!organizations.length) {
     redirect('/onboarding')
   }
-
+  
   if (checkActiveOrganization) {
     if (!organizations.some(organization => organization.membershipByUser.isActive)) {
       redirect('/onboarding/select-active-organization')
     }
   }
+
+  const activeOrganization = organizations.find((organization) => organization.membershipByUser.isActive)
   
-  return auth
+  return {...auth, activeOrganization}
 }
 
 

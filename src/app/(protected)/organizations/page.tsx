@@ -14,7 +14,7 @@ const Page = () => {
         text="All your organizations in one place"
         actions={  
         <Button className="max-w-[260px]" asChild>
-          <Link href='/organization/create'>Create organization</Link>
+          <Link href='/organizations/create'>Create organization</Link>
         </Button>
         }
       />

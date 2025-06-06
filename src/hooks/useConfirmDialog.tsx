@@ -23,7 +23,7 @@ type UseConfirmDialogProps = {
   //   onClick?: () => void
   // }>),
   trigger: React.ReactElement<{ onClick?: () => void }>,
-  action: (formData?: FormData) => void,
+  action: (formData: FormData) => void,
   title?: string,
   description?: string,
   actionState: ActionState,
@@ -44,16 +44,6 @@ const useConfirmDialog = ({
   const [open, setOpen] = useState(false)
   const router = useRouter();
   const pathname = usePathname();
-
-  // const dialogTrigger = cloneElement(
-  //   typeof trigger === "function" ? trigger(isPending) : trigger,
-  //   {
-  //     onClick: () => {
-  //       setOpen(true)
-  //     }
-  //   }
-  // )
-
 
   const dialogTrigger = cloneElement(
     isPending ? <Button className="cursor-pointer"><Loader/></Button> : trigger,
@@ -92,11 +82,6 @@ const useConfirmDialog = ({
     },
     onError: ({actionState}: { actionState: ActionState }) => {
       if (actionState.message) toast.error(actionState.message)
-      if (pathname !== '/tickets') {
-        router.push('/tickets')
-      } else {
-        setOpen(false)
-      }
     },
   }), [router, pathname, onSuccess])
 

@@ -124,9 +124,10 @@ const updateTicketSchema = z.object({
 
 export const createTicket = async (state: ActionState, formData: FormData): Promise<ActionState> => {
 
-  const {user} = await getAuth()
+  const {user, activeOrganization} = await getAuthOrRedirect()
   if (!user) return fromErrorToState(new Error('User is not authenticated'), formData)
-
+  
+  
   const title = formData.get('title') as string
   const content = formData.get('content') as string
   const deadline = formData.get('deadline') as string
@@ -134,7 +135,7 @@ export const createTicket = async (state: ActionState, formData: FormData): Prom
 
   try {
     const data = updateTicketSchema.parse({title, content, deadline, bounty})
-    const dataForDB = {...data, bounty: fromDollarsToCentsNoMoneyFormat(data.bounty), userId: user.id}
+    const dataForDB = {...data, bounty: fromDollarsToCentsNoMoneyFormat(data.bounty), userId: user.id, organizationId: activeOrganization!.id}
 
     await prisma.ticket.create(
       {
