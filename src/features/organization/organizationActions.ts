@@ -2,16 +2,18 @@
 
 import {prisma} from "@/lib/prismaClient";
 import {getAuth} from "@/features/auth/authActions";
-import {ActionState, toActionState} from "@/utils/formUtils";
+import {ActionState, fromErrorToState, toActionState} from "@/utils/formUtils";
 import {redirect} from "next/navigation";
-import {getAuthOrRedirect} from "@/utils/authUtils";
+import {generateEmailInvitationLink, getAuthOrRedirect} from "@/utils/authUtils";
 import {setCookie} from "@/actions/cookies";
 import {z} from "zod";
 import {revalidatePath} from "next/cache";
+import sendEmailPasswordReset from "@/features/auth/send-email-password-reset";
+import {hashToken} from "@/utils/crypto";
 
 
 export const getMemberships = async (organizationId: string) => {
-  const {user} = await getAuthOrRedirect();
+  await getAuthOrRedirect();
 
   const members = await prisma.membership.findMany({
     where: {
@@ -37,7 +39,7 @@ export const getMemberships = async (organizationId: string) => {
 
 // single
 export const getMembership = async ({organizationId, userId}: { organizationId: string, userId: string }) => {
-  const {user} = await getAuthOrRedirect();
+  getAuthOrRedirect();
 
   const membership = await prisma.membership.findUnique({
     where: {
@@ -197,7 +199,7 @@ export const deleteOrganization = async (organizationId: string, _state: ActionS
 
   // await getAuthOrRedirect({checkActiveOrganization: false})  
   await getAdminOrRedirect(organizationId)
-    
+
   // проверить еще можно, является ли юзер членом этой орг-ии
 
   try {
@@ -228,16 +230,12 @@ export const deleteMembership = async ({userId, organizationId}: {
   userId: string,
   organizationId: string
 }, _state: ActionState, _formData: FormData): Promise<ActionState> => {
-
   await getAuthOrRedirect({checkActiveOrganization: false})
   // проверить еще можно, является ли юзер членом этой орг-ии
-  
   // еще проверки - если роль не Админ, то юзер может только свой мембершип удалить 
 
   const memberships = await getMemberships(organizationId)
-
   const isLastMembership = (memberships ?? []).length === 1
-
   if (isLastMembership) return toActionState('ERROR', "You can't delete the last member!")
 
   try {
@@ -261,3 +259,177 @@ export const deleteMembership = async ({userId, organizationId}: {
   }
   return toActionState("SUCCESS", 'Membership deleted successfully')
 }
+
+
+type PermissionKey = "canDeleteTicket"
+
+
+export const togglePermission = async ({userId, organizationId, permissionKey}: {
+  userId: string,
+  organizationId: string,
+  permissionKey: PermissionKey
+}, _state: ActionState, _formData: FormData): Promise<ActionState> => {
+
+  await getAdminOrRedirect(organizationId)
+
+  if (permissionKey === "canDeleteTicket") {
+    const membership = await getMembership({organizationId, userId})
+
+    if (!membership) {
+      return toActionState('ERROR', 'Membership not found')
+    }
+
+    try {
+      await prisma.membership.update({
+        where: {
+          membershipId: {
+            organizationId, userId
+          }
+        },
+        data: {
+
+          [permissionKey]: membership[permissionKey] === true ? false : true
+        }
+      })
+
+    } catch (error) {
+      if (error instanceof Error) {
+        console.log(error.message)
+      }
+
+      return toActionState('ERROR', 'Не поменялсо')
+    }
+  }
+  revalidatePath(`/organizations/${organizationId}/memberships`)
+  return toActionState("SUCCESS", 'Membership changed successfully')
+}
+
+
+export const getActiveMembership = async () => {
+  const {user} = await getAuth()
+  if (!user) return null
+
+  const activeMembership = await prisma.membership.findFirst({
+    where: {
+      userId: user.id,
+      isActive: true
+    }
+  })
+
+  return activeMembership
+}
+
+
+export const getActiveOrganization = async () => {
+
+  const organizations = await getOrganizationsByUser()
+  if (!organizations.length) {
+    return null
+  }
+
+  const activeOrganization = organizations.find((organization) => organization.membershipByUser.isActive)
+  if (!activeOrganization) redirect('/onboarding/select-active-organization')
+
+  return activeOrganization
+}
+
+
+export const getInvitations = async ({organizationId}: { organizationId: string }) => {
+
+  await getAdminOrRedirect(organizationId)
+  const invitations = await prisma.invitation.findMany({
+    where: {
+      organizationId  // select потом еще добавить можно, чтобы хэши не сервить
+    },
+    include: {
+      invitedByUser: true
+    }
+  })
+
+  return invitations
+}
+
+const createInvitationSchema = z.object({
+  email: z.string().min(1, {message: 'is required'}).max(191).email()
+})
+
+export const createInvitation = async (organizationId: string,  _state: ActionState, formData: FormData): Promise<ActionState> => {
+  const {user} = await getAdminOrRedirect(organizationId)
+  
+  try {
+    const {email} =  createInvitationSchema.parse({
+      email: formData.get('email')
+    })    
+    // + Добавить проверку, что в орг-ии нет члена с таким имейлом. 
+    
+    
+    const emailInvitationLink = await generateEmailInvitationLink({
+      userId: user.id,
+      organizationId,
+      email      
+    })
+
+    console.log('emailInvitationLink = ', emailInvitationLink)
+
+    const result = await sendEmailPasswordReset({name: user.username, email: email, url: emailInvitationLink})
+    
+  } catch (error) {
+    return fromErrorToState(error, formData)
+  }
+
+  revalidatePath(`/organizations/${organizationId}/invitations`)
+  return toActionState('SUCCESS', 'User invited to organization') 
+ 
+}
+
+export const acceptInvitation = async (tokenId: string, state: ActionState, formData: FormData): Promise<ActionState> => {
+  // const {user} = await getAuth()
+
+  try {
+    
+    const tokenHash = hashToken(tokenId)
+    const invitation = await prisma.invitation.findFirst({
+      where: {
+        tokenHash,
+      }
+    })
+    
+    if (!invitation) return toActionState('ERROR', 'Invalid invitation token')
+    const user = await prisma.user.findUnique({
+      where: {
+        email: invitation.email
+      }
+    })
+    
+     // if (!user) - значит, не зареган!
+    
+    if (user) {
+      prisma.$transaction([
+        
+        prisma.invitation.delete({where: {tokenHash}}),
+        
+        prisma.membership.create({
+          data: {
+            organizationId: invitation.organizationId,
+            userId: user.id,
+            membershipRole: 'MEMBER',
+            isActive: false              
+          }
+        })                
+      ])
+    }
+
+        
+  } catch (error) {
+    return fromErrorToState(error, formData)
+  }
+  
+  setCookie({key: 'toast', value: 'Invitation accepted'})
+  redirect('/sign-in')
+  
+}
+
+
+
+
+

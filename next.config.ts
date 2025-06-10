@@ -4,6 +4,14 @@ module.exports = {
   //     dynamic: 30
   //   }
   // },
+
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "4mb"
+    }
+  },
+
+
   reactStrictMode: false,
   devIndicators: false,
   eslint: {

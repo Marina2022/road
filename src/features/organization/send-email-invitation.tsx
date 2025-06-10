@@ -5,12 +5,12 @@ type SendEmailPasswordResetParams = {
   name: string, email: string, url: string
 }
 
-const sendEmailPasswordReset = async ({name, email, url}: SendEmailPasswordResetParams) => {
+const sendEmailInvitation = async ({name, email, url}: SendEmailPasswordResetParams) => {
 
   const result = await resend.emails.send({
-    from: 'no-reply@mardev.ru',
+    from: 'email@mardev.ru',
     to: [email],
-    subject: 'Hello world',
+    subject: 'Invitation',
     react: <EmailPasswordReset toName={name} url={url}/>,
   });
   
@@ -22,4 +22,4 @@ const sendEmailPasswordReset = async ({name, email, url}: SendEmailPasswordReset
   return result
 }
 
-export default sendEmailPasswordReset;
+export default sendEmailInvitation;

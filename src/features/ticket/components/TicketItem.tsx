@@ -9,9 +9,10 @@ import {fromCentsToDollars} from "@/utils/currency";
 import TicketMoreMenu from "@/features/ticket/components/TicketMoreMenu";
 import {DropdownMenuTrigger} from "@/components/ui/dropdown-menu";
 import {isOwner} from "@/utils/authUtils";
-import Comments from "@/features/comment/components/Comments";
+import Comments from "@/features/comment/components/comments/Comments";
 import {CommentWithMetadata} from "@/features/comment/commetTypes";
 import {getAuth} from "@/features/auth/authActions";
+import Attachments from "@/features/attachments/components/Attachments";
 
 type TicketItemProps = {
   ticket: Prisma.TicketGetPayload<{
@@ -25,7 +26,7 @@ type TicketItemProps = {
   }>,
   isDetailed?: boolean,
   commentsData?: { 
-    list: CommentWithMetadata[],
+    list: CommentWithMetadata[],    
     metadata: {
       count: number,
       hasNext: boolean
@@ -108,6 +109,9 @@ const TicketItem = async ({ticket, isDetailed = false, commentsData}: TicketItem
           </div>
         }
 
+        {
+          isDetailed && <Attachments entityId={ticket.id} isOwner={isDetailed} entity="TICKET" />
+        }
       </>
     );
   }

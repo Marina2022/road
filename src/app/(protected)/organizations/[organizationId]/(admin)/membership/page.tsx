@@ -24,7 +24,7 @@ const Page = async({params}: PageProps) => {
         text="All members of organization"
         actions={
           <Button className="max-w-[260px]" asChild>
-            <Link href='/organizations/create'>Create organization</Link>
+            <Link href={`/organizations/${organizationId}/invitations`}>Invitations</Link>
           </Button>
         }
       />

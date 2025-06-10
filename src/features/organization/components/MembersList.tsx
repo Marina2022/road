@@ -5,6 +5,7 @@ import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow,} from "@/
 import {Button} from "@/components/ui/button";
 import {LucideArrowUpRight, LucideLogOut, LucidePencil} from "lucide-react";
 import MembershipDelete from './MembershipDelete';
+import PermissionToggle from './PermissionToggle';
 
 const MembersList = async ({organizationId}: { organizationId: string }) => {
 
@@ -12,23 +13,22 @@ const MembersList = async ({organizationId}: { organizationId: string }) => {
 
   return (
 
-    <Table className="max-w-[1000px]">      
+    <Table className="max-w-[1000px]">
       <TableHeader>
         <TableRow>
           <TableHead className="w-[100px]"></TableHead>
           <TableHead>Email</TableHead>
           <TableHead>Name</TableHead>
           <TableHead>Email verified</TableHead>
-          <TableHead >Joined At</TableHead>
-          <TableHead >Role</TableHead>
+          <TableHead>Joined At</TableHead>
+          <TableHead>Role</TableHead>
+          <TableHead>Can Delete Ticket</TableHead>
           <TableHead></TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {
           members.map((member, i) => {
-
-                        
             return <TableRow key={i}>
               <TableCell className="font-medium">{i + 1}</TableCell>
 
@@ -40,6 +40,17 @@ const MembersList = async ({organizationId}: { organizationId: string }) => {
               </TableCell>
               <TableCell
                 className="font-medium">{member.membershipRole}
+              </TableCell>
+
+              <TableCell
+                className="font-medium">
+
+                <PermissionToggle
+                  userId={member.userId}
+                  organizationId={organizationId}
+                  permissionKey="canDeleteTicket"
+                  permissionValue={member.canDeleteTicket}
+                />
               </TableCell>
 
               <TableCell className="flex gap-2">

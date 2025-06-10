@@ -27,16 +27,31 @@ model User {
   PasswordResetTokens    PasswordResetToken[]
   emailVerificationToken EmailVerificationToken[]
   memberships            Membership[]
+  invitsByUser           Invitation[]
+}
+
+model Invitation {
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  tokenHash       String       @unique
+  email           String
+  organizationId  String
+  Organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  invitedByUser   User?        @relation(fields: [invitedByUserId], references: [id], onDelete: SetNull)
+  invitedByUserId String?
+
+  @@index([organizationId])
 }
 
 model Membership {
-  userId         String
-  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  organizationId String
-  organization   Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  joinedAt       DateTime       @default(now())
-  isActive       Boolean
-  membershipRole MembershipRole @default(MEMBER)
+  userId          String
+  user            User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organizationId  String
+  organization    Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  joinedAt        DateTime       @default(now())
+  isActive        Boolean
+  membershipRole  MembershipRole @default(MEMBER)
+  canDeleteTicket Boolean        @default(true)
 
   // @@id([organizationId, userId])
   @@id(name: "membershipId", [userId, organizationId])
@@ -51,6 +66,7 @@ model Organization {
   name        String
   memberships Membership[]
   tickets     Ticket[]
+  invitations Invitation[]
 }
 
 model PasswordResetToken {
@@ -96,22 +112,42 @@ model Ticket {
   comments       Comment[]
   organizationId String
   Organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  attachments    Attachment[]
 
   @@index([userId])
   @@index([organizationId])
 }
 
 model Comment {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  content   String   @db.VarChar(1024)
-  userId    String?
-  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
-  ticketId  Int
-  ticket    Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  id          String       @id @default(cuid())
+  createdAt   DateTime     @default(now())
+  content     String       @db.VarChar(1024)
+  userId      String?
+  user        User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+  ticketId    Int
+  ticket      Ticket       @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  attachments Attachment[]
 
   @@index([ticketId])
   @@index([userId])
+}
+
+model Attachment {
+  id        String   @id @default(cuid())
+  name      String
+  ticketId  Int?
+  ticket    Ticket?  @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  commentId String?
+  comment   Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  entity    Entity
+
+  @@index([ticketId])
+  @@index([commentId])
+}
+
+enum Entity {
+  COMMENT
+  TICKET
 }
 
 enum TicketStatus {

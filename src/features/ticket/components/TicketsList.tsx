@@ -10,12 +10,13 @@ type TicketListProps =
   {
     userId?: string,
     searchParams: Awaited<ParsedSearchParams>
+    byOrganization?: boolean
   }
 
 
-const TicketsList = async ({userId, searchParams}: TicketListProps) => {
+const TicketsList = async ({userId, searchParams, byOrganization}: TicketListProps) => {
 
-  const ticketsData = await getTickets({userId, searchParams});
+  const ticketsData = await getTickets({userId, searchParams, byOrganization});
   const tickets = ticketsData?.list
   
   const options = [

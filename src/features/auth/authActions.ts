@@ -266,7 +266,7 @@ export const passwordChange = async (_state: ActionState, formData: FormData): P
       data: {userId: user.id, tokenId: tokenId}
     })
 
-    // await sendEmailPasswordReset({name: user.username, email: 'marusiiiia@yandex.ru', url: passwordResetLink})
+    // await sendEmailInvitation({name: user.username, email: 'marusiiiia@yandex.ru', url: passwordResetLink})
 
 
     return toActionState('SUCCESS', "Check your email for a reset link")

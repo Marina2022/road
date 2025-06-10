@@ -9,44 +9,6 @@ import {z} from "zod";
 import {CommentWithMetadata} from "@/features/comment/commetTypes";
 import {getAuthOrRedirect, isOwner} from "@/utils/authUtils";
 
-// export const getComments = async (ticketId: number, offset?: number) => {
-//
-//   const where = {ticketId}
-//
-//   const skip = offset ?? 0
-//   const take = 2
-//
-//   const [comments, count] = await prisma.$transaction([
-//     prisma.comment.findMany(
-//       {
-//         where,
-//         skip,
-//         take,
-//         include: {
-//           user: {
-//             select: {
-//               username: true,
-//             }
-//           }
-//         },
-//         orderBy: {
-//           createdAt: 'desc'
-//         }
-//       }),
-//
-//     prisma.comment.count({where})
-//
-//   ])
-//
-//   return {
-//     list: comments,
-//     metadata: {
-//       count,
-//       hasNext: count > skip + take,
-//     }
-//   }
-// }
-
 
 export const getComments = async (ticketId: number, cursor?: number | string) => {
 

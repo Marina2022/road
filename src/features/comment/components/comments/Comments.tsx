@@ -9,11 +9,12 @@ import {isOwner} from "@/utils/authUtils";
 import {CommentWithMetadata} from "@/features/comment/commetTypes";
 import {User} from "lucia";
 import {Button} from "@/components/ui/button";
-import {getComments} from '../commentActions';
+import {getComments} from '../../commentActions';
 import {PaginatedData} from "@/types/pagination";
 import {useInfiniteQuery, useQueryClient} from "@tanstack/react-query";
 import {useInView} from "react-intersection-observer";
 import {getBaseUrl} from "@/utils/testEnv";
+import AttachmentCreateButton from "@/features/attachments/components/AttachmentCreateButton";
 
 type CommentsProps = {
   ticketId: number;
@@ -39,9 +40,6 @@ const Comments = ({ticketId, commentsData, user}: CommentsProps) => {
     }
   })
 
-
-  console.log("getBaseUrl = ", getBaseUrl())
-  
    
   const queryClient = useQueryClient();
 
@@ -82,7 +80,13 @@ const Comments = ({ticketId, commentsData, user}: CommentsProps) => {
             comment={comment}
             buttons={[
               ...(isOwner(user, comment)
-                ? [<DeleteComment comment={comment} key={0} handleDelete={handleDelete}/>]
+                ? [
+                  <DeleteComment comment={comment} key={0} handleDelete={handleDelete}/>, 
+
+                  <AttachmentCreateButton key={1} entity={'COMMENT'} entityId={comment.id}   />
+                                   
+                  
+                ]
                 : [<div key={0} className="w-10"></div>])
             ]}
           />)
@@ -90,7 +94,6 @@ const Comments = ({ticketId, commentsData, user}: CommentsProps) => {
       </div>
 
       {
-        // metadata.hasNext && <div className="w-full flex justify-center mb-10">
         hasNextPage && <div className="w-full flex justify-center mb-10">
           <Button className="flex-1 ml-10" onClick={handleMore} variant="ghost"
                   disabled={isFetchingNextPage}>More</Button>

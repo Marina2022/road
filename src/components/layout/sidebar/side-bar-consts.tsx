@@ -1,11 +1,16 @@
 import {NavItem} from "@/components/layout/sidebar/sidebar-types";
-import {Book, CircleUser, Library, Users} from "lucide-react";
+import {Book, BookCopy, CircleUser, Library, Users} from "lucide-react";
 
 export const navItems: NavItem[] = [
   {
     title: "All Tickets",
     icon: <Library/>,
     href: '/'
+  },  
+  {
+    title: "Our Tickets",
+    icon: <BookCopy/>,
+    href: '/tickets/organization'
   },
   {
     title: "My Tickets",

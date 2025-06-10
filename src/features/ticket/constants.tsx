@@ -15,3 +15,12 @@ export const TICKET_LABELS = {
   OPEN: "Open",
   IN_PROGRESS: "In progress",
 }
+
+export const ACCEPTED = [
+  'image/png',
+  'image/jpeg',
+  'image/jpg',
+  'application/pdf'
+]
+
+export const MAX_SIZE = 4
